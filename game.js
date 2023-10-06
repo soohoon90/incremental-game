@@ -74,17 +74,6 @@ $(function () {
     }
   
     // ------------------------------------------
-    // -- initialize
-    // ------------------------------------------
-  
-    var gameData = {};
-    loadGame();
-    var lastRender = 0;
-    var saveCounter = 5000;
-  
-    window.requestAnimationFrame(loop);
-  
-    // ------------------------------------------
     // -- Interactive
     // ------------------------------------------
     function makebox() {
@@ -94,5 +83,22 @@ $(function () {
     }
   
     $("<button>make a box</button>").click(makebox).appendTo($("#controls"));
+
+    // ------------------------------------------
+    // -- initialize
+    // ------------------------------------------
+  
+    var gameData = {};
+    loadGame();
+    var lastRender = 0;
+    var saveCounter = 5000;
+  
+    $('<div id="controls"></div>').appendTo("body");
+    $('<div id="apps"></div>').appendTo("body");
+    $('<textarea id="data" cols="50" rows="10"></textarea>').appendTo("body");
+    $('<textarea id="debug" cols="50" rows="10"></textarea>').appendTo("body");
+
+    window.requestAnimationFrame(loop);
+
   });
   

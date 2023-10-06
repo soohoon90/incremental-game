@@ -1,0 +1,9 @@
+body{
+    font-family: sans-serif;
+    background-color: fafafa;
+}
+
+#app{
+    background-color: white;
+    border-radius: 8px;
+}
