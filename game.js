@@ -82,8 +82,6 @@ $(function () {
       render();
     }
   
-    $("<button>make a box</button>").click(makebox).appendTo($("#controls"));
-
     // ------------------------------------------
     // -- initialize
     // ------------------------------------------
@@ -97,6 +95,7 @@ $(function () {
     $('<div id="apps"></div>').appendTo("body");
     $('<textarea id="data" cols="50" rows="10"></textarea>').appendTo("body");
     $('<textarea id="debug" cols="50" rows="10"></textarea>').appendTo("body");
+    $("<button>make a box</button>").click(makebox).appendTo($("#controls"));
 
     window.requestAnimationFrame(loop);
 
