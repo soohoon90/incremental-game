@@ -5,12 +5,37 @@ body{
 
 #container{
     display:flex;
+    flex-direction: column;
+    width: 800px;
+    height: 600px;
+    border: 1px solid black;
+    border-radius: 8px;
+    background-clip: padding-box;
+    overflow: hidden;
+    margin: 16px auto;
+}
+
+#header{
+    display:flex;
+    align-items: center;
+    gap: 8px;
+    flex: 0 1 auto;
+    height: 32px;
+    padding: 8px 16px;
+    background-color: hsl(242, 44%, 43%);
+    color: white;
+}
+
+#main{
+    display: flex;
+    flex: 1 0 auto;
+    background-color: hsl(242, 44%, 92%);
 }
 
 #sidebar{
     display:flex;
     flex-direction: column;
-    background-color: #e9e9fa;
+    background-color: hsl(242, 44%, 89%);
 }
 
 .sidebar-item{
@@ -19,12 +44,17 @@ body{
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    width: 60px;
-    height: 60px;
-    gap: 10px;
+    width: 54px;
+    height: 54px;
+    gap: 4px;
     border-radius: 4px;
     margin: 4px;
     font-size: 10px;
+}
+
+.sidebar-item svg{
+    width: 32px;
+    height: 32px;
 }
 
 .sidebar-item:hover{
