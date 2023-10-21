@@ -1,0 +1,32 @@
+body{
+    background-color: #eee;
+    font-family: sans-serif;
+}
+
+#container{
+    display:flex;
+}
+
+#sidebar{
+    display:flex;
+    flex-direction: column;
+    background-color: #e9e9fa;
+}
+
+.sidebar-item{
+    display:flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    width: 60px;
+    height: 60px;
+    gap: 10px;
+    border-radius: 4px;
+    margin: 4px;
+    font-size: 10px;
+}
+
+.sidebar-item:hover{
+    background-color: rgba(0,0,0,0.1);
+}

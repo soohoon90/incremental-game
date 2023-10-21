@@ -3,18 +3,10 @@ $(function () {
     // -- Render
     // ------------------------------------------
     function render() {
+      // debug data
       var str = JSON.stringify(gameData, null, 2);
-      $("#app").html("");
       $("#data").html(str);
   
-      if (gameData.boxes) {
-        for (var i = 0; i < gameData.boxes.length; i++) {
-          var box = gameData.boxes[i];
-          $("#app").append(
-            "<div>" + "box " + i + ": " + box.energy + "/" + box.max + "</div>"
-          );
-        }
-      }
     }
   
     // ------------------------------------------
@@ -57,7 +49,7 @@ $(function () {
     }
 
     function debugOutput(text){
-        $("#debug").prepend(text+"\n");
+        $("#debug").prepend(new Date()+text+"\n");
     }
   
     function loop(timestamp) {
@@ -66,8 +58,6 @@ $(function () {
       update(progress);
       saveIfNeeded(progress);
       render();
-  
-      $("#app").append("<p>" + progress + "</p>");
   
       lastRender = timestamp;
       window.requestAnimationFrame(loop);
@@ -92,7 +82,7 @@ $(function () {
     var saveCounter = 5000;
   
     $('<div id="controls"></div>').appendTo("body");
-    $('<div id="apps"></div>').appendTo("body");
+    $('<div id="app"></div>').appendTo("body");
     $('<textarea id="data" cols="50" rows="10"></textarea>').appendTo("body");
     $('<textarea id="debug" cols="50" rows="10"></textarea>').appendTo("body");
     $("<button>make a box</button>").click(makebox).appendTo($("#controls"));
