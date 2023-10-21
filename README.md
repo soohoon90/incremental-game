@@ -1,6 +1,6 @@
 # Prototypes by Hoon
 
-[Try](soohoon90.github.io/incremental-game/)
+[Try](https://soohoon90.github.io/incremental-game/)
 
 Bunch of html, css, js prototypes for fun. Some of these are curiosity of how to implement.
 
