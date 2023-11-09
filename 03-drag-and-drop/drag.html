@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drag and Drop Kanban</title>
+</head>
+<style>
+    * {
+        padding:0;
+        margin:0;
+        box-sizing: border-box;
+        scrollbar-width: none;
+        font-family: sans-serif;
+    }
+
+    .board{
+        position: absolute;;
+        width:100%;
+        height:100%;
+        overflow: scroll;
+        background-color: rgb(51, 35, 145);
+    }
+
+    #todo-form{
+        padding: 32px;
+    }
+
+    #todo-form input{
+        padding: 12px;
+        margin-right: 12px;
+        width: 225px;
+        border-radius: 4px;
+        border: none;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+        background: white;
+        font-size: 14px;
+        outline: none;
+    }
+
+    #todo-form button{
+        padding: 12px 32px;    
+        border-radius: 4px;
+        border: none;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+        
+        font-size: 14px;
+        outline: none;
+        cursor: pointer;
+    }
+
+    .lanes{
+        display: flex;
+        align-items: flex-start;
+        justify-content: start;
+        gap: 16px;
+        padding: 12px 32px;
+        overflow: scroll;
+        height: 100%;
+    }
+
+    .swim-lane{
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        background: #f4f4f4;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+        padding: 12px;
+        border-radius: 4px;
+        width: 225px;
+        min-height: 120px;
+
+        flex-shrink:0;
+    }
+
+    .task{
+        background: white;
+        color: black;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        padding: 12px;
+        border-radius: 4px;
+        font-size: 16px;
+        cursor: move;
+    }
+
+    .is-dragging{
+        scale: 1.05;
+        box-shadow: 0px 4px 12px rgba(0,0,0,0.25);
+        background: rgb(50,50,50);
+        color: white;
+    }
+</style>
+<body>
+<div class="board">
+    <form id="todo-form">
+        <input type="text" placerholder="New TODO..." id="todo-input" />
+        <button type="submit">Add +</button>
+    </form>
+
+    <div class="lanes">
+        <div class="swim-lane" id="todo-lane">
+            <h3 class="heading">TODO</h3>
+            <p class="task" draggable="true">Get groceries</p>
+            <p class="task" draggable="true">Feed the dogs</p>
+            <p class="task" draggable="true">Moe the lawn</p>
+        </div>
+        <div class="swim-lane">
+            <h3 class="heading">Doing</h3>
+            <p class="task" draggable="true">Watch TV</p>
+        </div>
+        <div class="swim-lane">
+            <h3 class="heading">Done</h3>
+            <p class="task" draggable="true">Go outside</p>
+        </div>
+    </div>
+</div>
+
+
+<script src="drag.js"></script>
+</body>
+</html>
