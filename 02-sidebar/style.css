@@ -50,6 +50,7 @@ body{
     border-radius: 4px;
     margin: 4px;
     font-size: 10px;
+    cursor: pointer;
 }
 
 .sidebar-item svg{
@@ -59,4 +60,8 @@ body{
 
 .sidebar-item:hover{
     background-color: rgba(0,0,0,0.1);
+}
+
+.sidebar-item.active{
+    background-color: hsla(242, 44%, 43%, 0.829);
 }
