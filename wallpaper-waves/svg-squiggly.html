@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Colorful Wavy Strokes</title>
+  <style>
+    svg {
+      display: block;
+      margin: auto;
+    }
+  </style>
+</head>
+<body>
+
+<svg id="wave-container" width="800" height="400"></svg>
+
+<script>
+
+function Dot(x,y,color){
+    const dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+    dot.setAttribute("cx", x);
+    dot.setAttribute("cy", y);
+    dot.setAttribute("r", 5);
+    dot.setAttribute("fill", color);
+    return dot;
+}
+
+function createColorfulWavyStrokes(containerId, waveCount, waveHeight, waveLength, squiggleCount, waveColors, waveThickness) {
+  const container = document.getElementById(containerId);
+
+  for (let i = 0; i < waveCount; i++) {
+    const wave = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    const yOffset = i * (waveHeight); // Adjust the distance between waves
+    
+    var wavePath = `M -${waveThickness} ${yOffset}`;
+
+
+    for (let j = 1; j <= squiggleCount; j++){
+        const waveHalf = (waveLength/squiggleCount) /2;
+        const xOffset = j * (waveLength/squiggleCount);
+        if (j%2 == 0){
+            wavePath += `Q ${xOffset-waveHalf} ${yOffset-waveHeight}, ${xOffset} ${yOffset} `;
+        }else{
+            wavePath += `Q ${xOffset-waveHalf} ${yOffset+waveHeight}, ${xOffset} ${yOffset} `;
+        }
+        
+        // container.appendChild(Dot(xOffset-waveHalf, yOffset-waveHeight, "red"));
+        // container.appendChild(Dot(xOffset, yOffset, 'blue'));
+    }
+
+    wave.setAttribute("d", wavePath);
+    wave.setAttribute("fill", "none");
+    wave.setAttribute("stroke", waveColors[i % waveColors.length]);
+    wave.setAttribute("stroke-width", waveThickness);
+    wave.setAttribute("stroke-linecap", "round");
+    // wave.setAttribute("stroke-opacity", 0.1);
+
+    container.appendChild(wave);
+  }
+}
+
+const waveColors = ['#2196F3', '#4CAF50', '#FF9800', '#E91E63'];
+createColorfulWavyStrokes('wave-container', 4, 40, 800, 5, waveColors, 40);
+</script>
+
+</body>
+</html>

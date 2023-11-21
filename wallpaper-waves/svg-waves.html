@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Colorful Wavy Strokes</title>
+  <style>
+    svg {
+      display: block;
+      margin: auto;
+    }
+  </style>
+</head>
+<body>
+
+<svg id="wave-container" width="800" height="400"></svg>
+
+<script>
+function createColorfulWavyStrokes(containerId, waveCount, waveHeight, waveWidth, waveColors, waveThickness) {
+  const container = document.getElementById(containerId);
+
+  for (let i = 0; i < waveCount; i++) {
+    const wave = document.createElementNS("http://www.w3.org/2000/svg", "path");
+    const yOffset = i * (waveHeight); // Adjust the distance between waves
+
+    const wavePath = `
+        M -${waveThickness} ${yOffset} 
+        C ${waveWidth / 6} ${yOffset + waveHeight / 2}, ${waveWidth / 3} ${yOffset + waveHeight}, ${waveWidth / 2} ${yOffset} 
+        S ${(2 * waveWidth) / 3} ${yOffset - waveHeight}, ${waveWidth} ${yOffset}
+        `;
+    wave.setAttribute("d", wavePath);
+    wave.setAttribute("fill", "none");
+    wave.setAttribute("stroke", waveColors[i % waveColors.length]);
+    wave.setAttribute("stroke-width", waveThickness);
+
+    container.appendChild(wave);
+  }
+}
+
+const waveColors = ['#2196F3', '#4CAF50', '#FF9800', '#E91E63'];
+createColorfulWavyStrokes('wave-container', 8, 80, 1200, waveColors, 150);
+</script>
+
+</body>
+</html>
