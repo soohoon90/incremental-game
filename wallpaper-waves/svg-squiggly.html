@@ -16,7 +16,6 @@
       display: block;
     }
 
-
   </style>
 </head>
 <body>
@@ -36,6 +35,7 @@ function Dot(x,y,color){
 
 function createColorfulWavyStrokes(containerId, waveCount, waveHeight, waveLength, squiggleCount, waveColors, waveThickness) {
   const container = document.getElementById(containerId);
+  container.innerHTML = "";
 
   for (let i = 0; i < waveCount; i++) {
     const wave = document.createElementNS("http://www.w3.org/2000/svg", "path");
@@ -70,7 +70,51 @@ function createColorfulWavyStrokes(containerId, waveCount, waveHeight, waveLengt
 
 const waveColors = ['#2196F3', '#4CAF50', '#FF9800', '#E91E63'];
 createColorfulWavyStrokes('wave-container', 12, 90, 1920, 3, waveColors, 90);
+
+
+
 </script>
+<form>
+  <label for="waveCount">Wave Count:</label>
+  <input type="number" id="waveCount" value="12"><br>
+
+  <label for="waveHeight">Wave Height:</label>
+  <input type="number" id="waveHeight" value="90"><br>
+
+  <label for="waveLength">Wave Length:</label>
+  <input type="number" id="waveLength" value="1920"><br>
+
+  <label for="squiggleCount">Squiggle Count:</label>
+  <input type="number" id="squiggleCount" value="3"><br>
+
+  <label for="waveColors">Wave Colors (comma-separated):</label>
+  <input type="text" id="waveColors" value="#2196F3,#4CAF50,#FF9800,#E91E63"><br>
+
+  <label for="waveThickness">Wave Thickness:</label>
+  <input type="number" id="waveThickness" value="90"><br>
+</form>
+
+<script>
+
+  document.getElementById("waveCount").addEventListener("input", generateStrokes);
+  document.getElementById("waveHeight").addEventListener("input", generateStrokes);
+  document.getElementById("waveLength").addEventListener("input", generateStrokes);
+  document.getElementById("squiggleCount").addEventListener("input", generateStrokes);
+  document.getElementById("waveColors").addEventListener("input", generateStrokes);
+  document.getElementById("waveThickness").addEventListener("input", generateStrokes);
+
+  function generateStrokes() {
+      const waveCount = parseInt(document.getElementById("waveCount").value);
+      const waveHeight = parseInt(document.getElementById("waveHeight").value);
+      const waveLength = parseInt(document.getElementById("waveLength").value);
+      const squiggleCount = parseInt(document.getElementById("squiggleCount").value);
+      const waveColors = document.getElementById("waveColors").value.split(",");
+      const waveThickness = parseInt(document.getElementById("waveThickness").value);
+
+      createColorfulWavyStrokes('wave-container',waveCount, waveHeight, waveLength, squiggleCount, waveColors, waveThickness);
+  }
+</script>
+
 
 </body>
 </html>
