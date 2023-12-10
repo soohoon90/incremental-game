@@ -1,0 +1,75 @@
+<html>
+    <head>
+        <style>
+            #dropzone {
+                width: 300px;
+                height: 300px;
+                border: 5px dashed gray;
+                margin: 10px auto;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            #dropzone.active {
+                border-color: green;
+            }
+
+            #dropzone img {
+                max-width: 100%;
+                max-height: 100%;
+                object-fit: contain;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="dropzone">Drop an image here</div>
+        <script>
+            // Get the dropzone element
+            var dropzone = document.getElementById("dropzone");
+
+            // Add event listeners to handle drag and drop
+            dropzone.addEventListener("dragover", function (event) {
+                // Prevent default behavior (prevent file from being opened)
+                event.preventDefault();
+                // Add active class to dropzone
+                dropzone.classList.add("active");
+            });
+
+            dropzone.addEventListener("dragleave", function (event) {
+                // Remove active class from dropzone
+                dropzone.classList.remove("active");
+            });
+
+            dropzone.addEventListener("drop", function (event) {
+                // Prevent default behavior (prevent file from being opened)
+                event.preventDefault();
+                // Remove active class from dropzone
+                dropzone.classList.remove("active");
+                // Get the first file from the data transfer object
+                var file = event.dataTransfer.files[0];
+                // Check if the file is an image
+                if (file.type.startsWith("image/")) {
+                    // Create a file reader object
+                    var reader = new FileReader();
+                    // Add a load event listener to the reader
+                    reader.addEventListener("load", function () {
+                        // Create an image element
+                        var image = document.createElement("img");
+                        // Set the source attribute to the reader result
+                        image.src = reader.result;
+                        // Clear the dropzone content
+                        dropzone.innerHTML = "";
+                        // Append the image to the dropzone
+                        dropzone.appendChild(image);
+                    });
+                    // Read the file as a data URL
+                    reader.readAsDataURL(file);
+                } else {
+                    // Show an alert if the file is not an image
+                    alert("Please drop an image file");
+                }
+            });
+        </script>
+    </body>
+</html>

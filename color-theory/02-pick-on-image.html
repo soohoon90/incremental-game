@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Color Picker</title>
+        <link rel="preconnect" href="https://rsms.me/" />
+        <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+        <style>
+            /* CSS */
+            :root {
+                font-family: Inter, sans-serif;
+                font-feature-settings: "liga" 1, "calt" 1; /* fix for Chrome */
+            }
+            @supports (font-variation-settings: normal) {
+                :root {
+                    font-family: InterVariable, sans-serif;
+                }
+            }
+            body {
+                background-color: #333;
+                font-family: sans-serif;
+            }
+
+            #colorPicker__Container {
+                background-color: white;
+                border-radius: 12px;
+                margin: 12px;
+                width: 350px;
+                padding: 12px; 
+                position: absolute;
+                top:0;
+                left: 0;
+                opacity: 0.7;
+            }
+
+            #colorPicker__Header {
+                font-weight: bold;
+            }
+
+            svg {
+                max-width: 90vw;
+                max-height: 90vh;
+                margin: 0 auto;
+                display: block;
+            }
+
+            #dropzone {
+                width: 300px;
+                height: 300px;
+                border: 5px dashed gray;
+                margin: 10px auto;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            #dropzone.active {
+                border-color: green;
+            }
+
+            #dropzone img {
+                max-width: 100%;
+                max-height: 100%;
+                object-fit: contain;
+            }
+        </style>
+    </head>
+    <body>
+        <svg id="svg-container" viewBox="0 0 1600 900"></svg>
+        
+        <div id="colorPicker__Container">
+            <div id="colorPicker__Header">Color Picker</div>
+            <div id="dropzone">Drop an image here</div>
+            <form>
+                <label for="Colors">Pick a color: </label>
+                <input type="color" id="input__color" /><br />
+            </form>
+
+           
+        </div>
+        <script>
+            // Get the dropzone element
+            var dropzone = document.getElementById("dropzone");
+
+            // Add event listeners to handle drag and drop
+            dropzone.addEventListener("dragover", function (event) {
+                // Prevent default behavior (prevent file from being opened)
+                event.preventDefault();
+                // Add active class to dropzone
+                dropzone.classList.add("active");
+            });
+
+            dropzone.addEventListener("dragleave", function (event) {
+                // Remove active class from dropzone
+                dropzone.classList.remove("active");
+            });
+
+            dropzone.addEventListener("drop", function (event) {
+                // Prevent default behavior (prevent file from being opened)
+                event.preventDefault();
+                // Remove active class from dropzone
+                dropzone.classList.remove("active");
+                // Get the first file from the data transfer object
+                var file = event.dataTransfer.files[0];
+                // Check if the file is an image
+                if (file.type.startsWith("image/")) {
+                    // Create a file reader object
+                    var reader = new FileReader();
+                    // Add a load event listener to the reader
+                    reader.addEventListener("load", function () {
+                        // Create an image element
+                        var image = document.createElement("img");
+                        // Set the source attribute to the reader result
+                        image.src = reader.result;
+                        // Clear the dropzone content
+                        dropzone.innerHTML = "";
+                        // Append the image to the dropzone
+                        dropzone.appendChild(image);
+                    });
+                    // Read the file as a data URL
+                    reader.readAsDataURL(file);
+                } else {
+                    // Show an alert if the file is not an image
+                    alert("Please drop an image file");
+                }
+            });
+        </script>
+
+        <script>
+            function fillSVGContainer(SVGContainerID, color) {
+                const svgElement = document.getElementById(SVGContainerID);
+                const { x, y, width, height } = svgElement.viewBox.baseVal;
+
+                svgElement.innerHTML = "";
+
+                const rect = document.createElementNS(
+                    "http://www.w3.org/2000/svg",
+                    "rect"
+                );
+                rect.setAttribute("width", width);
+                rect.setAttribute("height", height);
+                rect.setAttribute("fill", color);
+
+                svgElement.appendChild(rect);
+            }
+
+            function generateSVG() {
+                const c = document.getElementById("input__color").value;
+                console.log(c);
+                fillSVGContainer("svg-container", c);
+            }
+
+            document
+                .getElementById("input__color")
+                .addEventListener("input", generateSVG);
+
+            generateSVG();
+        </script>
+    </body>
+</html>
