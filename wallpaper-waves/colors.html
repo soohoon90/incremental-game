@@ -1,31 +1,67 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prototype 03 - colors</title>
-</head>
-<style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Colors</title>
+  <style>
     body{
-        background-color: #fafafa;
-        font-family: sans-serif;
+        width: 100%;
+        height: 100%;
     }
-    #container{
-        border-radius: 8px;
-        background-color: white;
-        padding: 8px;
-        margin: 8px auto;
-    }
-</style>
+  </style>
+</head>
 <body>
-    
-<div id="container">
 
+<div id="colors">
+    
 </div>
 
-<script>
+<form>
+  <label for="Colors">Colors</label>
+  <input type="color" id="Colors" ><br>
+</form>
 
+<script>
+  document.getElementById("Colors").addEventListener("input", updateBoxes);
+
+  function createColorfulStrokes(containerId, containerWidth, containerHeight, lineColors, lineAngle, lineMargin) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = "";
+
+    const lineCount = lineColors.length;
+    lineHeight = ( containerHeight - lineMargin * 2.0) / lineCount;
+
+    for (let i = 0; i < lineCount; i++) {
+        const line = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        const yOffset = i * (lineHeight) + lineMargin; // Adjust the distance between waves
+        
+        var wavePath = `M 0 ${yOffset}`;
+
+        line.setAttribute("d", wavePath);
+        line.setAttribute("fill", "none");
+        line.setAttribute("stroke", waveColors[i % waveColors.length]);
+        line.setAttribute("stroke-width", waveThickness);
+        line.setAttribute("stroke-linecap", "round");
+
+        container.appendChild(line);
+    }
+  }
+
+    const Colors = ['#2196F3', '#4CAF50', '#FF9800', '#E91E63'];
+    // createColorfulStrokes('svg-container', Colors, 0, 0);
+
+  function generateStrokes() {
+      const c = parseInt(document.getElementById("Colors").value);
+      const a = parseInt(document.getElementById("Angle").value);
+      const m = parseInt(document.getElementById("Margins").value);
+
+      createColorfulWavyStrokes('svg-container', 1600, 900, c, a, m);
+  }
+
+  generateStrokes();
 </script>
+
 
 </body>
 </html>

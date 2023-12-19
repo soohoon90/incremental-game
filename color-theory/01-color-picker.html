@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Color Picker</title>
+  <style>
+    body{
+        width: 100%;
+        height: 100%;
+    }
+    svg {
+      border: 5px solid blue;
+      width: 50%;
+      margin: 10px auto;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+
+<svg id="svg-container" viewBox="0 0 1600 900"></svg>
+
+<form>
+  <label for="Colors">Colors</label>
+  <input type="color" id="input__color"><br>
+</form>
+
+<script>
+  function fillSVGContainer(SVGContainerID, color){
+    const svgElement = document.getElementById(SVGContainerID);
+    const {x, y, width, height} = svgElement.viewBox.baseVal;
+
+    svgElement.innerHTML = "";
+
+    const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    rect.setAttribute("width", width);
+    rect.setAttribute("height", height);
+    rect.setAttribute("fill", color);
+
+    svgElement.appendChild(rect);
+  }
+
+  function generateSVG() {
+      const c = document.getElementById("input__color").value;
+      console.log(c);
+      fillSVGContainer('svg-container', c);
+  }
+
+  document.getElementById("input__color").addEventListener("input", generateSVG);
+
+  generateSVG();
+</script>
+
+
+</body>
+</html>
