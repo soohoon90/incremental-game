@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Colorful Star</title>
+  <style>
+    svg {
+      border: 1px solid blue;
+      max-width: 90%;
+      max-height: 90vh;
+      margin: 10px auto;
+      display: block;
+    }
+  </style>
+</head>
+
+<body>
+  <svg id="svg-container" viewBox="0 0 1600 900"></svg>
+
+  <div id="controls">
+    Background Color: <br />
+    <input type="color" id="bgcolor" value="#BCCCD3" /><br />
+
+    Primary Color: <br />
+    <input type="color" id="fgcolor" value="#2196F3" /><br />
+
+    radius: <br />
+    <input type="range" id="radius" value="0" min="-100" max="100" /><br />
+
+    variance: <br />
+    <input type="range" id="variance" value="30" min="0" max="100" /><br />
+
+    num_points: <br />
+    <input type="range" id="num_points" value="7" min="3" max="12" /><br />
+  </div>
+
+  <script>
+    const inputs = document.getElementsByTagName("input");
+    for (const el of Array.from(inputs)) {
+      el.addEventListener("input", generateUsingInput);
+    }
+
+    function generateUsingInput() {
+      const bg = document.getElementById("bgcolor").value;
+      const fg = document.getElementById("fgcolor").value;
+      const numPoints = parseInt(document.getElementById("num_points").value);
+      const radius = parseInt(document.getElementById("radius").value);
+      const variance = parseInt(document.getElementById("variance").value);
+
+      console.log("generating...");
+
+      createColorfulBlobs("svg-container", bg, fg, numPoints, radius, variance);
+    }
+
+    function Dot(x, y, color) {
+      const dot = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "circle"
+      );
+      dot.setAttribute("cx", x);
+      dot.setAttribute("cy", y);
+      dot.setAttribute("r", 10);
+      dot.setAttribute("fill", color);
+      return dot;
+    }
+
+    function Line(x1, y1, x2, y2, color) {
+      const l = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "line"
+      );
+      l.setAttribute("x1", x1);
+      l.setAttribute("y1", y1);
+      l.setAttribute("x2", x2);
+      l.setAttribute("y2", y2);
+      l.setAttribute("stroke", color);
+      return l;
+    }
+
+    function getRandomInt(min, max) {
+      min = Math.ceil(min);
+      max = Math.floor(max);
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function createColorfulBlobs(
+      containerId,
+      bgColor,
+      fgColor,
+      numPoints, radius, variance
+    ) {
+      const container = document.getElementById(containerId);
+      const { x, y, width, height } = container.viewBox.baseVal;
+      const numCount = 1;
+
+      container.innerHTML = "";
+
+      const bgrect = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "rect"
+      );
+      bgrect.setAttribute("width", width);
+      bgrect.setAttribute("height", height);
+      bgrect.setAttribute("fill", bgColor);
+      container.appendChild(bgrect);
+
+      for (let i = 0; i < numCount; i++) {
+        const blobRadius = (Math.min(width, height) / 2) * 0.8 * Math.pow(1.01, radius);
+
+        // choose a origin point
+        // const xOrigin = getRandomInt(blobRadius / 2, width - blobRadius / 2);
+        // const yOrigin = getRandomInt(blobRadius / 2, height - blobRadius / 2);
+        const xOrigin = width / 2;
+        const yOrigin = height / 2;
+
+        container.appendChild(Dot(xOrigin, yOrigin, "red"));
+
+        let angle = (2 * Math.PI) / numPoints;
+        let subangle = (2 * Math.PI) / (numPoints * 3.0);
+
+        var wavePath = "";
+        
+        var radius = blobRadius;
+        
+        var points = [];
+
+        // create a list of points & control points
+        for (let j = 0; j < numPoints; j++) {
+
+          varied_radius = radius - variance*radius/100 * Math.random();
+
+          let xVal = xOrigin + varied_radius * Math.cos(angle * j);
+          let yVal = yOrigin + varied_radius * Math.sin(angle * j);
+
+          console.log(xVal, yVal);
+          // container.appendChild(Dot(xVal, yVal, "blue"));
+          points.push({x: xVal, y: yVal});
+        }
+
+        for (let j = 0; j < numPoints; j++) {
+          points.push(points[j]);
+        }
+
+        console.log(points);
+
+        // Generate the path data from the points array
+        var pathData = "M " + points[0].x + " " + points[0].y;
+        // container.appendChild(Dot(points[0].x, points[0].y, "purple"));
+
+        for (var j = 0; j < numPoints; j++) {
+          // Calculate the control points of the Bezier curve
+          if (j == 0){
+            var p0 = points[numPoints-1];
+            var p1 = points[0];
+            var p2 = points[1];
+            var p3 = points[2];
+          } else{
+            var p0 = points[j - 1];
+            var p1 = points[j];
+            var p2 = points[j + 1];
+            var p3 = points[j + 2];
+          }
+          
+          var c1 = { x: p1.x + (p2.x - p0.x) / 6, y: p1.y + (p2.y - p0.y) / 6 };
+          var c2 = { x: p2.x - (p3.x - p1.x) / 6, y: p2.y - (p3.y - p1.y) / 6 };
+          
+          // container.appendChild(Dot(c1.x, c1.y, "yellow"));
+          // container.appendChild(Dot(c2.x, c2.y, "yellow"));
+          
+          // Add the Bezier curve segment to the path data
+          pathData += " C " + c1.x + " " + c1.y + " " + c2.x + " " + c2.y + " " + p2.x + " " + p2.y;
+        }
+
+
+        var blob = document.createElementNS("http://www.w3.org/2000/svg", "path");
+
+        blob.setAttribute("d", pathData);
+        blob.setAttribute("fill", fgColor);
+        // blob.setAttribute("stroke", "red");
+        // blob.setAttribute("stroke-width", 5);
+
+        console.log(blob);
+
+        container.appendChild(blob);
+
+      }
+    }
+
+    // initial render
+    generateUsingInput();
+  </script>
+</body>
+
+</html>
