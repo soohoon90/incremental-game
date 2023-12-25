@@ -27,7 +27,7 @@
     <input type="color" id="fgcolor" value="#2196F3" /><br />
 
     progress: <br />
-    <input type="range" id="progress" value="0" min="-100" max="100" /><br />
+    <input type="range" id="progress" value="57" min="0" max="100" /><br />
 
   </div>
 
@@ -47,13 +47,6 @@
       createSVG("svg-container", bg, fg, progress);
     }
 
-
-    function getRandomInt(min, max) {
-      min = Math.ceil(min);
-      max = Math.floor(max);
-      return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
-
     function createSVG(
       containerId,
       bgColor,
@@ -66,15 +59,56 @@
 
       container.innerHTML = "";
 
+      const radius = (Math.min(width, height) / 2) * 0.8;
+
       const bgrect = document.createElementNS(
         "http://www.w3.org/2000/svg",
-        "rect"
+        "circle"
       );
-      bgrect.setAttribute("width", width);
-      bgrect.setAttribute("height", height);
+      bgrect.setAttribute("r", radius);
+      bgrect.setAttribute("cx", width / 2);
+      bgrect.setAttribute("cy", height / 2);
       bgrect.setAttribute("fill", bgColor);
       container.appendChild(bgrect);
 
+      // wedge based on % number
+      // arc requries a starting point and end point 
+      const wedgeRadius = (Math.min(width, height) / 2) * 0.8;
+      const xCenter = width / 2;
+      const yCenter = height / 2;
+
+      var angle = (2 * Math.PI) / 100;
+      var pathData = "";
+
+      var xStart = xCenter + wedgeRadius * Math.cos(angle * 75 );
+      var yStart = yCenter + wedgeRadius * Math.sin(angle * 75 );
+      pathData = `M ${xStart} ${yStart}`;
+
+      // if progress is more than 50%, draw using 2 arcs if more than 50%
+      if (progress < 50){
+        var xEnd = xCenter + wedgeRadius * Math.cos(angle * (75+progress));
+        var yEnd = yCenter + wedgeRadius * Math.sin(angle * (75+progress));
+        pathData += `A ${wedgeRadius} ${wedgeRadius} 0 0 1 ${xEnd} ${yEnd}`;
+      }else{
+        var xHalf = xCenter + wedgeRadius * Math.cos(angle * (75+50));
+        var yHalf = yCenter + wedgeRadius * Math.sin(angle * (75+50));
+        pathData += `A ${wedgeRadius} ${wedgeRadius} 0 0 1 ${xHalf} ${yHalf}`;
+        var xEnd = xCenter + wedgeRadius * Math.cos(angle * (75+progress));
+        var yEnd = yCenter + wedgeRadius * Math.sin(angle * (75+progress));
+        pathData += `A ${wedgeRadius} ${wedgeRadius} 0 0 1 ${xEnd} ${yEnd}`;
+      }
+      
+      // create center point so it's a wedge
+      pathData += `L ${xCenter} ${yCenter}`;
+      pathData += `L ${xStart} ${yStart}`;
+
+      var wedge = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      wedge.setAttribute("d", pathData);
+      wedge.setAttribute("fill", fgColor);
+      // wedge.setAttribute("stroke", "red");
+      // wedge.setAttribute("stroke-width", 5);
+
+      container.appendChild(wedge);
     }
 
     // initial render
