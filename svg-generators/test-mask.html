@@ -1,0 +1,26 @@
+
+<svg viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg">
+  <!-- background -->
+  <rect x="0" y="0" width="1920" height="1080" fill="#eeeeee" rx="64"/>
+
+  <!-- bg circle -->
+  <circle cx="960" cy="540" r="256" fill="#D9D9D9"/>
+
+  <!-- half-fill circle --> 
+  <mask id="myMask" style="mask-type:alpha" maskUnits="userSpaceOnUse">
+    <!-- <rect x="704" y="456" width="512" height="340" fill="url(#myGradient)"/> -->
+    <rect x="704" y="456" width="512" height="340" fill="#000000"/>
+  </mask>
+
+  <circle cx="960" cy="540" r="256" fill="#A93D3D" mask="url(#myMask)"/>
+
+  <!-- gradient -->
+  <defs>
+    <linearGradient id="myGradient" x1="960" y1="796" x2="960" y2="503.5" gradientUnits="userSpaceOnUse">
+    <stop offset="0.5" stop-color="#000000"/>
+    <stop offset="1" stop-color="#000000" stop-opacity="0.5"/>
+    </linearGradient>
+  </defs>
+
+  </svg>
+   
