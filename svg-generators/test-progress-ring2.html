@@ -1,0 +1,74 @@
+<body>
+  <style>
+    svg{
+      margin: 10px;
+    }
+    svg text{
+      font-family: sans-serif;
+      font-size: 14px;
+      font-weight: bold
+    }
+  </style>
+  </body>
+  <script>
+  
+    function createSVG(progress) {
+      var xmlns = "http://www.w3.org/2000/svg";
+      var radius = 25;
+      var strokeWidth = 10;
+  
+      var boxWidth = 100;
+      var boxHeight = 100;
+  
+      var svgElem = document.createElementNS(xmlns, "svg");
+      svgElem.setAttribute("viewBox", "0 0 " + boxWidth + " " + boxHeight);
+      svgElem.setAttribute("width", boxWidth);
+      document.body.insertAdjacentElement("beforeend", svgElem);
+  
+      const bgrect = document.createElementNS(xmlns,"circle");
+      bgrect.setAttribute("r", radius);
+      bgrect.setAttribute("cx", boxWidth / 2);
+      bgrect.setAttribute("cy", boxHeight / 2);
+      bgrect.setAttribute("fill", "none");
+      bgrect.setAttribute("stroke", "#dddddd");
+      bgrect.setAttribute("stroke-width", strokeWidth);
+      svgElem.appendChild(bgrect);
+
+  
+      const ring = document.createElementNS(xmlns,"circle");
+      var circumference = 2 * Math.PI * radius;
+      var dasharray = circumference * progress / 100;
+      var dashoffset = circumference / 4.0;
+      ring.setAttribute("r", radius);
+      ring.setAttribute("cx", boxWidth / 2);
+      ring.setAttribute("cy", boxHeight / 2);
+      ring.setAttribute("fill", "none");
+      ring.setAttribute("stroke-dasharray", dasharray + "," + (circumference-dasharray) );
+      ring.setAttribute("stroke-dashoffset", (dasharray)+dashoffset); 
+      ring.setAttribute("stroke", "green");
+      ring.setAttribute("stroke-width", strokeWidth);
+      ring.setAttribute("stroke-linecap", "round"); 
+      svgElem.appendChild(ring);
+  
+      const t = document.createElementNS(xmlns,"text");
+      t.setAttribute("x", boxWidth / 2);
+      t.setAttribute("y", boxHeight / 2);
+      t.setAttribute("text-anchor", "middle");
+      t.setAttribute("dominant-baseline", "middle");
+      t.innerHTML = progress;
+      svgElem.appendChild(t);
+  
+  
+  
+    }
+   
+    createSVG(0);
+    createSVG(1);
+    createSVG(25);
+    createSVG(50);
+    createSVG(70);
+    createSVG(90);
+    createSVG(100);
+  
+  
+  </script>
