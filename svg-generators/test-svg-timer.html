@@ -43,13 +43,13 @@
 
         const ring = document.createElementNS(xmlns, "circle");
         var circumference = 2 * Math.PI * radius;
-        var dasharray = circumference * progress / 100;
+        var dasharray = circumference * progress / 100.0;
         var dashoffset = circumference / 4.0;
         ring.setAttribute("r", radius);
         ring.setAttribute("cx", boxWidth / 2);
         ring.setAttribute("cy", boxHeight / 2);
         ring.setAttribute("fill", "none");
-        ring.setAttribute("stroke-dasharray", dasharray + "," + (circumference - dasharray));
+        ring.setAttribute("stroke-dasharray", dasharray + " " + (circumference - dasharray));
         ring.setAttribute("stroke-dashoffset", dashoffset);
         ring.setAttribute("stroke", "green");
         ring.setAttribute("stroke-width", strokeWidth);
@@ -68,14 +68,14 @@
         container.appendChild(svgElem);
 
         // Set an interval function to update the timer
-        var interval = setInterval(function () {
+        var intervalFunction = function () {
           // Decrease the seconds by one
           remaining--;
           progress = remaining / seconds * 100;
 
           // Update the timer text
           t.innerHTML = `${remaining} / ${seconds}`;
-          dasharray = progress;
+          dasharray = circumference * remaining / seconds; 
           ring.setAttribute("stroke-dasharray", dasharray + " " + (circumference - dasharray));
           console.log(progress);
           console.log("stroke-dasharray", dasharray + " " + (circumference - dasharray));
@@ -87,8 +87,11 @@
             // Change the timer background to yellow
             t.innerHTML = `Done`;
             bgrect.setAttribute("fill", "yellow");
+            ring.setAttribute("stroke", "none");
           }
-        }, 1000);
+        };
+        intervalFunction();
+        var interval = setInterval(intervalFunction, 1000);
       });
     }
 
