@@ -1,0 +1,124 @@
+<body>
+    <style>
+      svg{
+        margin: 10px;
+      }
+      svg text{
+        font-family: sans-serif;
+        font-size: 14px;
+        font-weight: bold
+      }
+    </style>
+    </body>
+    <script>
+    
+      function createSegmentedRing(progress, numSegments) {
+        var xmlns = "http://www.w3.org/2000/svg";
+        var radius = 30;
+        var strokeWidth = 13;
+    
+        var boxWidth = 100;
+        var boxHeight = 100;
+    
+        var svgElem = document.createElementNS(xmlns, "svg");
+        svgElem.setAttribute("viewBox", "0 0 " + boxWidth + " " + boxHeight);
+        svgElem.setAttribute("width", boxWidth);
+        document.body.insertAdjacentElement("beforeend", svgElem);
+    
+        const bgCircle = document.createElementNS(xmlns,"circle");
+        bgCircle.setAttribute("r", radius);
+        bgCircle.setAttribute("cx", boxWidth / 2);
+        bgCircle.setAttribute("cy", boxHeight / 2);
+        bgCircle.setAttribute("fill", "none");
+        bgCircle.setAttribute("stroke", "#dddddd");
+        bgCircle.setAttribute("stroke-width", strokeWidth);
+        svgElem.appendChild(bgCircle);
+    
+
+        const bgSegmentedRing = document.createElementNS(xmlns,"circle");
+        var circumference = 2 * Math.PI * radius;
+
+        // calculate the dasharray for numsegments
+        // should be (circumference - ((numSegments+1)* gaps)) / numSegments
+
+        var gap = 3; 
+
+        var dasharray = (circumference - (numSegments * gap)) / numSegments;
+        var dashoffset = circumference / 4.0;
+        bgSegmentedRing.setAttribute("r", radius);
+        bgSegmentedRing.setAttribute("cx", boxWidth / 2);
+        bgSegmentedRing.setAttribute("cy", boxHeight / 2);
+        bgSegmentedRing.setAttribute("fill", "none");
+        bgSegmentedRing.setAttribute("stroke-dasharray", `${dasharray} ${gap}`);
+        console.log(`${dasharray} ${gap} ${(dasharray+gap)*numSegments} ${circumference}`);
+        bgSegmentedRing.setAttribute("stroke-dashoffset", dashoffset);
+        bgSegmentedRing.setAttribute("stroke", "black"); 
+        bgSegmentedRing.setAttribute("stroke-width", strokeWidth ); 
+        // bgSegmentedRing.setAttribute("stroke-linecap", "round"); 
+        svgElem.appendChild(bgSegmentedRing);
+    
+
+
+        const fgSegmentedRing = document.createElementNS(xmlns,"circle");
+        // var circumference = 2 * Math.PI * radius;
+
+        // calculate the dasharray for "filled" part of segments
+        // should calculate number of segment from progress first
+        var dasharray = (circumference - (numSegments * gap)) / numSegments;
+        // var dashoffset = circumference / 4.0;
+
+        var numFilled = numSegments - 2; 
+        var empty = circumference - (numFilled * (dasharray + gap) - gap); 
+        
+        var filledArray = "";
+        var filledLength = 0;
+        for (let j = 1; j <= numFilled; j++ ){
+            if (j == numFilled){
+                filledArray += `${dasharray} ${empty} `;
+                filledLength += dasharray;
+                filledLength += empty;
+            }else{
+                filledArray += `${dasharray} ${gap} `;
+                filledLength += dasharray;
+                filledLength += gap;
+            }   
+        }
+
+        console.log(filledArray);
+        console.log(filledLength);
+        console.log(circumference);
+
+        fgSegmentedRing.setAttribute("r", radius);
+        fgSegmentedRing.setAttribute("cx", boxWidth / 2);
+        fgSegmentedRing.setAttribute("cy", boxHeight / 2);
+        fgSegmentedRing.setAttribute("fill", "none");
+        fgSegmentedRing.setAttribute("stroke-dasharray", filledArray);
+        fgSegmentedRing.setAttribute("stroke-dashoffset", dashoffset);
+        fgSegmentedRing.setAttribute("stroke", "green");
+        fgSegmentedRing.setAttribute("stroke-width", strokeWidth);
+        // fgSegmentedRing.setAttribute("stroke-linecap", "round"); 
+        svgElem.appendChild(fgSegmentedRing);
+    
+        const t = document.createElementNS(xmlns,"text");
+        t.setAttribute("x", boxWidth / 2);
+        t.setAttribute("y", boxHeight / 2);
+        t.setAttribute("text-anchor", "middle");
+        t.setAttribute("dominant-baseline", "middle");
+        t.innerHTML = `${numFilled}/${numSegments}`;
+        svgElem.appendChild(t);
+      }
+     
+      createSegmentedRing(65, 3);
+      createSegmentedRing(65, 4);
+      createSegmentedRing(65, 5);
+      createSegmentedRing(65, 6);
+      createSegmentedRing(65, 7);
+      createSegmentedRing(65, 8);
+      createSegmentedRing(65, 9);
+      createSegmentedRing(65, 10);
+      createSegmentedRing(65, 11);
+      createSegmentedRing(65, 12);
+      createSegmentedRing(65, 24);
+      createSegmentedRing(65, 36);
+    
+    </script>
