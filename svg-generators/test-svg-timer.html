@@ -80,7 +80,7 @@
           console.log(progress);
           console.log("stroke-dasharray", dasharray + " " + (circumference - dasharray));
           // Check if the timer reaches zero
-          if (remaining === 0) {
+          if (remaining <= 0) {
             // Clear the interval
             clearInterval(interval);
 
@@ -95,13 +95,14 @@
       });
     }
 
+    createButton(1);
+    createButton(3);
     createButton(5);
     createButton(10);
     createButton(15);
     createButton(30);
     createButton(60);
-    createButton(120);
-
+    createButton(90);
 
     var container = document.createElement("div");
     // Append the button to the body
