@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <script>
+    function createButton(timerLength) {
+      // Create a button element
+      var button = document.createElement("button");
+      button.textContent = `Create a ${timerLength} timer`;
+      button.dataset.timer = timerLength;
+      // Append the button to the body
+      document.body.appendChild(button);
+
+      // Add a click event listener to the button
+      button.addEventListener("click", function (evt) {
+        // Create a new timer element
+        var xmlns = "http://www.w3.org/2000/svg";
+        var svgElem = document.createElementNS(xmlns, "svg");
+        var boxWidth = 100;
+        var boxHeight = 100;
+        var radius = 30;
+        var strokeWidth = 10;
+        svgElem.setAttribute("viewBox", `0 0 ${boxWidth} ${boxHeight}`);
+        svgElem.setAttribute("width", boxWidth);
+
+        // Convert the timer text to seconds
+        var seconds = evt.currentTarget.dataset.timer;
+        var remaining = seconds;
+        var progress = remaining / seconds * 100;
+
+        const bgrect = document.createElementNS(xmlns, "circle");
+        bgrect.setAttribute("r", radius);
+        bgrect.setAttribute("cx", boxWidth / 2);
+        bgrect.setAttribute("cy", boxHeight / 2);
+        bgrect.setAttribute("fill", "#eeeeee");
+        svgElem.appendChild(bgrect);
+
+        const ring = document.createElementNS(xmlns, "circle");
+        var circumference = 2 * Math.PI * radius;
+        var dasharray = circumference * progress / 100;
+        var dashoffset = circumference / 4.0;
+        ring.setAttribute("r", radius);
+        ring.setAttribute("cx", boxWidth / 2);
+        ring.setAttribute("cy", boxHeight / 2);
+        ring.setAttribute("fill", "none");
+        ring.setAttribute("stroke-dasharray", dasharray + "," + (circumference - dasharray));
+        ring.setAttribute("stroke-dashoffset", dashoffset);
+        ring.setAttribute("stroke", "green");
+        ring.setAttribute("stroke-width", strokeWidth);
+        ring.setAttribute("stroke-linecap", "round");
+        svgElem.appendChild(ring);
+
+        const t = document.createElementNS(xmlns, "text");
+        t.setAttribute("x", 50);
+        t.setAttribute("y", 50);
+        t.setAttribute("text-anchor", "middle");
+        t.setAttribute("dominant-baseline", "middle");
+        t.innerHTML = seconds;
+        svgElem.appendChild(t);
+
+        // Append the timer to the body
+        container.appendChild(svgElem);
+
+        // Set an interval function to update the timer
+        var interval = setInterval(function () {
+          // Decrease the seconds by one
+          remaining--;
+          progress = remaining / seconds * 100;
+
+          // Update the timer text
+          t.innerHTML = `${remaining} / ${seconds}`;
+          dasharray = progress;
+          ring.setAttribute("stroke-dasharray", dasharray + " " + (circumference - dasharray));
+          console.log(progress);
+          console.log("stroke-dasharray", dasharray + " " + (circumference - dasharray));
+          // Check if the timer reaches zero
+          if (remaining === 0) {
+            // Clear the interval
+            clearInterval(interval);
+
+            // Change the timer background to yellow
+            t.innerHTML = `Done`;
+            bgrect.setAttribute("fill", "yellow");
+          }
+        }, 1000);
+      });
+    }
+
+    createButton(5);
+    createButton(10);
+    createButton(15);
+    createButton(30);
+    createButton(60);
+    createButton(120);
+
+
+    var container = document.createElement("div");
+    // Append the button to the body
+    document.body.appendChild(container);
+  </script>
+</body>
+
+</html>
