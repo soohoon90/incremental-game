@@ -1,0 +1,118 @@
+<body>
+  <style>
+    svg{
+      margin: 10px;
+    }
+    svg text{
+      font-family: sans-serif;
+      font-size: 10px;
+      font-weight: bold
+    }
+  </style>
+  </body>
+  <script>
+  // Create a button element
+  var button = document.createElement("button");
+  button.textContent = "Create a timer";
+
+  // Append the button to the body
+  document.body.appendChild(button);
+
+  // Add a click event listener to the button
+  button.addEventListener("click", function() {
+    // Create a new timer element
+    var timer = document.createElement("div");
+    timer.className = "timer";
+    timer.textContent = "1:30";
+
+    // Append the timer to the body
+    document.body.appendChild(timer);
+
+    // Convert the timer text to seconds
+    var seconds = 90;
+
+    // Set an interval function to update the timer
+    var interval = setInterval(function() {
+      // Decrease the seconds by one
+      seconds--;
+
+      // Convert the seconds to minutes and seconds format
+      var minutes = Math.floor(seconds / 60);
+      var secondsLeft = seconds % 60;
+
+      // Pad the seconds with a leading zero if needed
+      if (secondsLeft < 10) {
+        secondsLeft = "0" + secondsLeft;
+      }
+
+      // Update the timer text
+      timer.textContent = minutes + ":" + secondsLeft;
+
+      // Check if the timer reaches zero
+      if (seconds === 0) {
+        // Clear the interval
+        clearInterval(interval);
+
+        // Change the timer background to yellow
+        timer.style.backgroundColor = "yellow";
+      }
+    }, 1000);
+  });
+
+    function clickToRemoveWhenDone(){
+
+    }
+
+    function clickToAddNewCountDown(){
+
+    }
+
+    function enableCountDown(el){
+      setInterval(decrementCounter, 1000);
+    }
+
+    function createSVGCountDown(progress) {
+      var xmlns = "http://www.w3.org/2000/svg";
+      var radius = 25;
+      var strokeWidth = 10;
+  
+      var boxWidth = 100;
+      var boxHeight = 100;
+  
+      var svgElem = document.createElementNS(xmlns, "svg");
+      svgElem.setAttribute("viewBox", "0 0 " + boxWidth + " " + boxHeight);
+      svgElem.setAttribute("width", boxWidth);
+      document.body.insertAdjacentElement("beforeend", svgElem);
+  
+      const bg = document.createElementNS(xmlns,"rect");
+      bg.setAttribute("width", boxWidth - 10);
+      bg.setAttribute("height", boxHeight - 10);
+      bg.setAttribute("x", 5);
+      bg.setAttribute("y", 5);
+      bg.setAttribute("rx", 15); 
+      if (progress > 0 ){
+        bg.setAttribute("fill", "#fafafa");
+      }else{
+        bg.setAttribute("fill", "#e92");
+      }
+      
+      svgElem.appendChild(bg);
+  
+      const t = document.createElementNS(xmlns,"text");
+      t.setAttribute("x", boxWidth / 2);
+      t.setAttribute("y", boxHeight / 2);
+      t.setAttribute("text-anchor", "middle");
+      t.setAttribute("dominant-baseline", "middle");
+      if (progress > 0 ){
+        t.innerHTML = progress;
+      }else{
+        t.innerHTML = "Done";
+      }
+
+      svgElem.appendChild(t);
+  
+    }
+   
+    createSVGCountDown(25);
+
+  </script>
