@@ -1,0 +1,167 @@
+<body>
+  <style>
+    body{
+      background-color: rgb(240,240,240);
+      font-family: sans-serif;
+
+    } 
+    svg {
+      border: 1px solid blue;
+      max-width: 90%;
+      max-height: 90vh;
+      border-radius: 20px;
+      margin: 10px auto;
+      display: block;
+    }
+    svg text{
+      font-size: 30px;
+      font-weight: bold
+    }
+    #controls{
+      box-sizing: border-box;
+      padding: 20px;
+      border-radius: 20px;
+      border: 1px solid rgba(0,0,0,0.2);
+      background-color: white;
+      box-shadow: 0 5px 5px rgba(0,0,0,0.2);
+      max-width: 90%;
+      margin: 20px auto;
+    } 
+  </style>
+
+  <svg id="svg-container" viewBox="0 0 1600 900"></svg>
+
+  <div id="controls">
+    Background Color: <br />
+    <input type="color" id="bgcolor" value="#BCCCD3" /><br />
+
+    Primary Color: <br />
+    <input type="color" id="fgcolor" value="#2196F3" /><br />
+
+    radius: <br />
+    <input type="range" id="radius" value="100" min="0" max="200" /><br />
+
+    Filled (%): <br />
+    <input type="range" id="numFilled" value="60" min="1" max="100" /><br />
+
+    Segments (denominator): <br />
+    <input type="range" id="numSegments" value="60" min="3" max="100" /><br />
+
+    Line Width: <br /> 
+    <input type="range" id="width" value="5" min="0" max="100" /><br />
+
+    Line Length: <br /> 
+    <input type="range" id="length" value="30" min="10" max="100" /><br />
+
+  </div>
+</body>
+
+  <script>
+    const inputs = document.getElementsByTagName("input");
+    for (const el of Array.from(inputs)) {
+      el.addEventListener("input", generateUsingInput);
+    }
+
+    function generateUsingInput() {
+      const inputs = document.getElementsByTagName("input");
+      var input_array = new Array();
+      for (const el of Array.from(inputs)) {
+        // console.log(`${el.id} has value ${el.value}`);
+        input_array[el.id] = el.value;
+      }
+      // console.log(input_array);
+
+      console.log("generating...");
+      console.log(input_array);
+      createSegmentedRing("svg-container", input_array);
+    }  
+
+    function createSegmentedRing(containerId, inputs) {
+      const xmlns = "http://www.w3.org/2000/svg";
+  
+      const container = document.getElementById(containerId);
+      container.innerHTML = "";
+
+      const cvb = container.viewBox.baseVal;
+      const boxWidth = cvb.width;
+      const boxHeight = cvb.height;
+
+      const fgColor = inputs['fgcolor'];
+      const bgColor = inputs['bgcolor'];
+      const radius = parseInt(inputs['radius']);
+      
+      const filledPercent = parseInt(inputs['numFilled']);
+      const numSegments = parseInt(inputs['numSegments']);
+      const numFilled = Math.floor(filledPercent / 100 * numSegments);
+
+      const strokeWidth = parseInt(inputs['width']);
+      const strokeLength = parseInt(inputs['length']);
+
+      // const bgCircle = document.createElementNS(xmlns,"circle");
+      // bgCircle.setAttribute("r", radius);
+      // bgCircle.setAttribute("cx", boxWidth / 2);
+      // bgCircle.setAttribute("cy", boxHeight / 2);
+      // bgCircle.setAttribute("fill", "none");
+      // bgCircle.setAttribute("stroke", "#dddddd");
+      // bgCircle.setAttribute("stroke-width", strokeWidth);
+      // container.appendChild(bgCircle);
+
+
+      for(let i =0; i < numSegments; i++){
+        const l = document.createElementNS(xmlns,"line");
+
+        var angle = (2 * Math.PI) * i / numSegments  - (2 * Math.PI/4);
+        var xStart = boxWidth/2 + radius * Math.cos(angle);
+        var yStart = boxHeight/2 + radius * Math.sin(angle);
+
+        var xEnd = boxWidth/2 + (radius+strokeLength) * Math.cos(angle);
+        var yEnd = boxHeight/2 + (radius+strokeLength) * Math.sin(angle);
+
+        l.setAttribute("x1", xStart);
+        l.setAttribute("x2", xEnd);
+        l.setAttribute("y1", yStart);
+        l.setAttribute("y2", yEnd);
+
+        l.setAttribute("stroke", bgColor);
+        l.setAttribute("stroke-width", strokeWidth);
+        l.setAttribute("stroke-linecap", "round");
+        container.appendChild(l);
+      }
+
+      /********************************************************
+       * foreground "filled" ring
+       ********************************************************/
+       for(let i =0; i < numFilled; i++){
+        const l = document.createElementNS(xmlns,"line");
+
+        var angle = (2 * Math.PI) * i / numSegments - (2 * Math.PI/4);
+        var xStart = boxWidth/2 + radius * Math.cos(angle);
+        var yStart = boxHeight/2 + radius * Math.sin(angle);
+
+        var xEnd = boxWidth/2 + (radius+strokeLength) * Math.cos(angle);
+        var yEnd = boxHeight/2 + (radius+strokeLength) * Math.sin(angle);
+
+        l.setAttribute("x1", xStart);
+        l.setAttribute("x2", xEnd);
+        l.setAttribute("y1", yStart);
+        l.setAttribute("y2", yEnd);
+
+        l.setAttribute("stroke", fgColor);
+        l.setAttribute("stroke-width", strokeWidth);
+        l.setAttribute("stroke-linecap", "round");
+
+        container.appendChild(l);
+      }
+      // text
+      const t = document.createElementNS(xmlns,"text");
+      t.setAttribute("x", boxWidth / 2);
+      t.setAttribute("y", boxHeight / 2);
+      t.setAttribute("text-anchor", "middle");
+      t.setAttribute("dominant-baseline", "middle");
+      t.innerHTML = `${numFilled}/${numSegments}`;
+      container.appendChild(t);
+    }
+   
+    generateUsingInput();
+
+  </script>
