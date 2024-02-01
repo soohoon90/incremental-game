@@ -2,170 +2,230 @@
 <html lang="en">
 
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Boxes, an Incremental Game by Hoon</title>
-	<style>
-		body{
-			font-family: sans-serif;
-			background-color: #fefefe;
-		}
-		#container{
-			box-sizing: border-box;
-			border-radius: 20px;
-			margin: 20px auto;
-			background-color: rgba(0,0,0,.9);
-			display: flex;
-		}
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Boxes, an Incremental Game by Hoon</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #fefefe;
+    }
 
+    #container {
+      box-sizing: border-box;
+      border-radius: 30px;
+      margin: 20px auto;
+      background-color: rgba(150, 150, 150, .25);
+      display: flex;
+      gap: 15px;
+      padding: 15px;
 
-	</style>
+    }
+
+    #scores {
+      box-sizing: border-box;
+      border-radius: 15px;
+      padding: 20px;
+      background-color: rgba(150, 150, 150, .25);
+    }
+
+    #controls{
+      box-sizing: border-box;
+      border-radius: 15px;
+      padding: 20px;
+      background-color: rgba(150, 150, 150, .25);
+    }
+
+    .vstack{
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+
+    }
+
+    #boxes{
+      box-sizing: border-box;
+      border-radius: 15px;
+      padding: 20px; 
+       
+      background-color: rgba(150, 150, 150, .25);
+    }
+
+    .box{
+      width: 100px;
+      height: 100px;
+      border-radius: 5px;
+      background-color: rgba(150, 150, 150, .25);
+
+    }
+  </style>
 </head>
 
 <body>
-	<div id="intro">
-		<h1>Boxes</h1>
-		<span>an incremental game.</span>
-		<p>Instructions: click button to create fill the box. Different Box will take different amount of time to complete.
-			When box is 100%, you can harvest the box. Using the harvested material, make money, and invest into future
-			upgrades</p>
-	</div>   
-	<div id="container">
-			<div id="number">0</div>
-			<button id="btnUpgrade">Buy Upgrade</button>
-			<button id="btnBuyGold">Buy Gold</button>
-			<button id="btnBoost">Boost</button>
-			<button id="btnReset">Reset</button>
-			
-	</div>
-	
-	<script>
-			const saveKey = "01-numbers-v3";
-			const saveInterval = 5000;
-	
-			function reset(){
-					gameData = { 
-							point: 0, 
-							level: 1, 
-							gold: 0,
-							boxes: [],
-							boostTime: 0,
-							boostAmount: 2
-					};
-			}
-	
-			function loadGame() {
-					var savegame = JSON.parse(localStorage.getItem(saveKey));
-					if (savegame !== null) {
-							gameData = savegame;
-					//Function to update all of screen
-					} else {
-							reset();
-					}
-			}
-			function saveIfNeeded(progress) {
-					lastSaved += progress;
-					if (lastSaved > saveInterval) {
-							lastSaved = 0;
-							localStorage.setItem(saveKey, JSON.stringify(gameData));
-					}
-			}
-			function loop(timestamp) {
-					var progress = timestamp - lastRender;
-	
-					update(progress);
-					saveIfNeeded(progress);
-					render();
-	
-					lastRender = timestamp;
-					window.requestAnimationFrame(loop);
-			}
-	
-			function update(progress) {
-					// gameData.point += progress/1000 * gameData.level;
-				boxes = document.getElementsByClassName("box");
-				for (let i = 0; i < boxes.length; i++){
-					if (boxes[i].progress > boxes[i].duration){
-						boxes[i].progress = boxes[i].duration;
-					} else{
-						boxes[i].progress += progress;
-					}
-					console.log(boxes[i]);
-				}
-			}
+  <div id="intro">
+    <h1>Boxes</h1>
+    <span>is an incremental game.</span>
+    <p>Instructions: click button to create fill the box. Different Box will take different amount of time to complete.
+      When box is 100%, you can harvest the box. Using the harvested material, make money, and invest into future
+      upgrades</p>
+  </div>
+  <div id="container">
+    <div id="scores"></div> 
 
-			function createBox(){
-				if (gameData.boxes.length < gameData.maxboxcount){
-					gameData.boxes.push({progress:0, duration:5000});
-				}
-			}
-	
-			function render() {
-					theNumber.innerHTML = 
-					"Points: "+ Math.round(gameData.point) + 
-					"<p>Gold: "+ Math.round(gameData.gold) + "</p>" +
-					"<p>Level: "+gameData.level+"</p>";
-					let upgradeCost = Math.round(10 + 1.2**gameData.level);
-					let buyGoldCost = 100;
-	
-					
+    <div class="vstack">
+      <div id="controls">
+        <button id="btnUpgrade">Buy Upgrade</button>
+        <button id="btnBuyGold">Buy Gold</button>
+        <button id="btnBoost">Boost</button>
+        <button id="btnReset">Reset</button>
+      </div>
 
-					theButtonUpgrade.innerHTML = "Upgrade (Cost: "+upgradeCost+")";
-					theButtonBuyGold.innerHTML = "Buy Gold (Cost: "+buyGoldCost+")";
-	
-					if (gameData.point < upgradeCost){
-							theButtonUpgrade.disabled = true;
-					}else{
-							theButtonUpgrade.disabled = false;
-					}
-	
-					if (gameData.point < buyGoldCost){
-							theButtonBuyGold.disabled = true;
-					}else{
-							theButtonBuyGold.disabled = false;
-					}
-	
-			}
-	
-			function UpgradeHandler(){
-					let cost = Math.round(10 + 1.2**gameData.level);
-	
-					if (gameData.point < cost){
-							return;
-					}else{
-							gameData.point -= cost;
-							gameData.level += 1;
-					}
-			}
-	
-			function BuyGoldHandler(){
-					let buyGoldCost = 100;
-	
-					if (gameData.point < buyGoldCost){
-							return;
-					}else{
-							gameData.point -= buyGoldCost;
-							gameData.gold += 1;
-					}   
-			}
-			
-			var theNumber = document.querySelector("#number");
-			var theButtonUpgrade = document.querySelector("#btnUpgrade");
-			var theButtonBuyGold = document.querySelector("#btnBuyGold");
-			var theButtonReset = document.querySelector("#btnReset");
-	
-			theButtonUpgrade.addEventListener('click', UpgradeHandler, false);
-			theButtonBuyGold.addEventListener('click', BuyGoldHandler, false);
-			theButtonReset.addEventListener('click', reset, false);
-	
-			var gameData = {};
-			loadGame();
-			var lastRender = 0;
-			var lastSaved = 0;
-	
-			window.requestAnimationFrame(loop);
-	
-	</script>
-	
-	</body>
-	</html>
+      <div id="boxes">
+        <div class="box"></div>
+      </div>
+  </div>
+  </div>
+
+  <script>
+    const saveKey = "01-boxes";
+    const saveInterval = 5000;
+
+    function reset() {
+      gameData = {
+        point: 0,
+        level: 1,
+        gold: 0,
+        scores: [],
+        resources: [],
+        boxes: [],
+        maxboxcount: 1
+      };
+      localStorage.setItem(saveKey, JSON.stringify(gameData));
+    }
+
+    function loadGame() {
+      var savegame = JSON.parse(localStorage.getItem(saveKey));
+      if (savegame !== null) {
+        gameData = savegame;
+        //Function to update all of screen
+      } else {
+        reset();
+      }
+    }
+    function saveIfNeeded(progress) {
+      lastSaved += progress;
+      if (lastSaved > saveInterval) {
+        lastSaved = 0;
+        localStorage.setItem(saveKey, JSON.stringify(gameData));
+        console.log(gameData);
+      }
+    }
+    function loop(timestamp) {
+      var progress = timestamp - lastRender;
+
+      update(progress);
+      saveIfNeeded(progress);
+      render();
+
+      lastRender = timestamp;
+      window.requestAnimationFrame(loop);
+    }
+
+    function update(progress) {
+      // gameData.point += progress/1000 * gameData.level;
+      for (let i = 0; i < gameData.boxes.length; i++) {
+        const thebox = gameData.boxes[i];
+        if (thebox.progress > thebox.duration) {
+          thebox.progress = thebox.duration;
+        } else {
+          thebox.progress += progress;
+        }
+      }
+
+      for (let i = 0; i < gameData.resources.length; i++) {
+        const r = gameData.resources[i];
+        if (r.amount > r.maximum) {
+          r.amount = r.maximum;
+        } else {
+          r.amount += r.increment;
+        }
+      }
+    }
+
+    function createBox() {
+      if (gameData.boxes.length < gameData.maxboxcount) {
+        gameData.boxes.push({ progress: 0, duration: 5000 });
+      }
+    }
+
+    function render() {
+      theNumber.innerHTML =
+        "Points: " + Math.round(gameData.point) +
+        "<p>Gold: " + Math.round(gameData.gold) + "</p>" +
+        "<p>Level: " + gameData.level + "</p>";
+      let upgradeCost = Math.round(10 + 1.2 ** gameData.level);
+      let buyGoldCost = 100;
+
+
+
+      theButtonUpgrade.innerHTML = "Upgrade (Cost: " + upgradeCost + ")";
+      theButtonBuyGold.innerHTML = "Buy Gold (Cost: " + buyGoldCost + ")";
+
+      if (gameData.point < upgradeCost) {
+        theButtonUpgrade.disabled = true;
+      } else {
+        theButtonUpgrade.disabled = false;
+      }
+
+      if (gameData.point < buyGoldCost) {
+        theButtonBuyGold.disabled = true;
+      } else {
+        theButtonBuyGold.disabled = false;
+      }
+
+    }
+
+    function UpgradeHandler() {
+      let cost = Math.round(10 + 1.2 ** gameData.level);
+
+      if (gameData.point < cost) {
+        return;
+      } else {
+        gameData.point -= cost;
+        gameData.level += 1;
+      }
+    }
+
+    function BuyGoldHandler() {
+      let buyGoldCost = 100;
+
+      if (gameData.point < buyGoldCost) {
+        return;
+      } else {
+        gameData.point -= buyGoldCost;
+        gameData.gold += 1;
+      }
+    }
+
+    var theNumber = document.querySelector("#scores"); 
+    var theButtonUpgrade = document.querySelector("#btnUpgrade");
+    var theButtonBuyGold = document.querySelector("#btnBuyGold");
+    var theButtonReset = document.querySelector("#btnReset");
+
+    theButtonUpgrade.addEventListener('click', UpgradeHandler, false);
+    theButtonBuyGold.addEventListener('click', BuyGoldHandler, false);
+    theButtonReset.addEventListener('click', reset, false);
+
+    var gameData = {};
+    loadGame();
+    var lastRender = 0;
+    var lastSaved = 0;
+    
+
+    window.requestAnimationFrame(loop);
+
+  </script>
+
+</body>
+
+</html>
