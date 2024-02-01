@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+
+  <div id="container">
+    <div id="scores"></div>
+    <div id="controls"></div>
+    <div id="timers"></div>
+  </div>
+
+  <script>
+
+    var gamedata = {
+      maxbox: 3,
+      cost: 100,
+      points: 0
+    };
+
+    function updateScores(){
+      const scores = document.querySelector("#scores");
+      scores.innerHTML = "";
+      for (let key in gamedata){
+        scores.innerHTML += `${key}: ${gamedata[key]}<br>`;
+      }
+    }
+
+    updateScores();
+
+    function createButton(timerLength) {
+      // Create a button element
+      var button = document.createElement("button");
+      button.textContent = `Create a ${timerLength} timer`;
+      button.dataset.timer = timerLength;
+      // Append the button to the body
+      document.body.appendChild(button);
+
+      // Add a click event listener to the button
+      button.addEventListener("click", function (evt) {
+        // Create a new timer element
+        var xmlns = "http://www.w3.org/2000/svg";
+        var svgElem = document.createElementNS(xmlns, "svg");
+        var boxWidth = 100;
+        var boxHeight = 100;
+        var radius = 30;
+        var strokeWidth = 10;
+        svgElem.setAttribute("viewBox", `0 0 ${boxWidth} ${boxHeight}`);
+        svgElem.setAttribute("width", boxWidth);
+
+        // Convert the timer text to seconds
+        var seconds = evt.currentTarget.dataset.timer;
+        var remaining = seconds;
+        var progress = remaining / seconds * 100;
+
+        svgElem.dataset.timer = seconds;
+
+        const currentBoxCount = document.querySelectorAll('svg').length;
+        if (currentBoxCount < gamedata.maxbox) {
+
+          const bgrect = document.createElementNS(xmlns, "circle");
+          bgrect.setAttribute("r", radius);
+          bgrect.setAttribute("cx", boxWidth / 2);
+          bgrect.setAttribute("cy", boxHeight / 2);
+          bgrect.setAttribute("fill", "#eeeeee");
+          svgElem.appendChild(bgrect);
+
+          const ring = document.createElementNS(xmlns, "circle");
+          var circumference = 2 * Math.PI * radius;
+          var dasharray = circumference * progress / 100.0;
+          var dashoffset = circumference / 4.0;
+          ring.setAttribute("r", radius);
+          ring.setAttribute("cx", boxWidth / 2);
+          ring.setAttribute("cy", boxHeight / 2);
+          ring.setAttribute("fill", "none");
+          ring.setAttribute("stroke-dasharray", dasharray + " " + (circumference - dasharray));
+          ring.setAttribute("stroke-dashoffset", dashoffset);
+          ring.setAttribute("stroke", "green");
+          ring.setAttribute("stroke-width", strokeWidth);
+          ring.setAttribute("stroke-linecap", "round");
+          svgElem.appendChild(ring);
+
+          const t = document.createElementNS(xmlns, "text");
+          t.setAttribute("x", 50);
+          t.setAttribute("y", 50);
+          t.setAttribute("text-anchor", "middle");
+          t.setAttribute("dominant-baseline", "middle");
+          t.innerHTML = seconds;
+          svgElem.appendChild(t);
+
+          // Append the timer to the body
+          container.appendChild(svgElem);
+
+          // Set an interval function to update the timer
+          var intervalFunction = function () {
+            // Decrease the seconds by one
+            remaining--;
+            progress = remaining / seconds * 100;
+
+            // Update the timer text
+            t.innerHTML = `${remaining} / ${seconds}`;
+
+            // update the progress ring
+            dasharray = circumference * remaining / seconds;
+            ring.setAttribute("stroke-dasharray", dasharray + " " + (circumference - dasharray));
+
+            // when done
+            if (remaining <= 0) {
+              // Clear the interval
+              clearInterval(interval);
+
+              // Change the timer background to yellow
+              t.innerHTML = `Done`;
+              bgrect.setAttribute("fill", "yellow");
+              ring.setAttribute("stroke", "none");
+            }
+          };
+
+          // delete the 'done' timer when clicked
+          // give points
+
+          svgElem.addEventListener("click", function (evt) {
+            svg = evt.currentTarget;
+            if (remaining <= 0) {
+              gamedata.points += parseInt(svg.dataset.timer);
+              svg.remove();
+              updateScores();
+            }
+          });
+
+          // call it once
+          intervalFunction();
+          // set interval
+          var interval = setInterval(intervalFunction, 1000);
+        }
+
+        updateScores();
+
+      });
+    }
+
+    createButton(7);
+
+
+    var container = document.createElement("div");
+    // Append the button to the body
+    document.body.appendChild(container);
+
+    var scores = document.createElement("div");
+    scores.setAttribute("id", "scores");
+    // Append the button to the body
+    document.body.appendChild(scores);
+
+  </script>
+</body>
+
+</html>
