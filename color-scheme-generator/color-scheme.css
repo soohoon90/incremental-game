@@ -1,0 +1,66 @@
+:root {
+    font-family: Inter, sans-serif;
+    font-feature-settings: "liga" 1, "calt" 1; /* fix for Chrome */
+}
+@supports (font-variation-settings: normal) {
+    :root {
+        font-family: InterVariable, sans-serif;
+    }
+}
+body {
+    background-color: #333;
+    font-family: sans-serif;
+}
+
+#colorPicker__Container {
+    background-color: white;
+    border-radius: 12px;
+    margin: 12px;
+    width: 350px;
+    padding: 12px; 
+    position: absolute;
+    top:0;
+    left: 0;
+    opacity: 0.9;
+}
+
+#colorPicker__Header {
+    font-weight: bold;
+}
+
+svg {
+    max-width: 90vw;
+    max-height: 90vh;
+    margin: 0 auto;
+    display: block;
+}
+
+.color{
+    width: 2em;
+    height: 2em;
+    border-radius: 1em;
+    margin: 0.5em;
+    border: 1px solid white;
+    box-shadow: 0 0 4px rgba(0,0,0,0.6);
+    display: inline-block;
+}
+
+#dropzone {
+    width: 300px;
+    height: 300px;
+    border: 5px dashed gray;
+    margin: 10px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#dropzone.active {
+    border-color: green;
+}
+
+#dropzone img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}

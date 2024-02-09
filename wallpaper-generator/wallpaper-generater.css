@@ -8,6 +8,8 @@ svg {
   border: 1px solid blue;
   border-radius: 20px;
   display: block;
+  width: 100%;
+  object-fit:cover;
 }
 
 svg text {

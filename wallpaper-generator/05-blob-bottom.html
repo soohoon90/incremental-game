@@ -10,11 +10,11 @@
 
 <body>
   <div id="app-container">
-    <svg id="svg-container" viewBox="0 0 1600 900" width="100%" height="100%" ></svg>
+    <svg id="svg-container" viewBox="0 0 1600 900" width="100%" height="100%"></svg>
 
     <div id="controls">
       Background Color: <br />
-      <input type="color" id="bgcolor" value="#BCCCD3" /><br />
+      <input type="color" id="bgcolor" value="#142929" /><br />
 
       Primary Color: <br />
       <input type="color" id="fgcolor" value="#2196F3" /><br />
@@ -23,10 +23,10 @@
       <input type="color" id="fgcolor2" value="#A196F3" /><br /> -->
 
       steps: <br />
-      <input type="range" id="steps" value="3" min="2" max="15" /><br />
+      <input type="range" id="steps" value="8" min="2" max="15" /><br />
 
       size_adjustment: <br />
-      <input type="range" id="radius" value="0" min="-100" max="150" /><br />
+      <input type="range" id="radius" value="100" min="-100" max="300" /><br />
 
       amplitude: <br />
       <input type="range" id="variance" value="30" min="0" max="100" /><br />
@@ -97,8 +97,8 @@
       const blobRadius = (Math.min(width, height) / 2) * 0.8 * Math.pow(1.01, radius);
       console.log(`${width}x ${height} ${blobRadius}`);
 
-      const xOrigin = width / 2;
-      const yOrigin = height / 2;
+      const xOrigin = width/2;
+      const yOrigin = height/2;
 
       let angle = (2 * Math.PI) / numPoints;
       let subangle = (2 * Math.PI) / (numPoints * 3.0);
@@ -144,28 +144,18 @@
         pathData += " C " + c1.x + " " + c1.y + " " + c2.x + " " + c2.y + " " + p2.x + " " + p2.y;
       }
 
-      // console.log(pathData);
-      // console.log(steps);
-
       const hsl1 = hexToHSL(fgColor);
       const hsl2 = hexToHSL(fgColor2);
 
-      console.log("hsl:");
-      console.log(hsl1);
-      console.log(hsl2);
-
       for (let i = 0; i < steps; i++) {
-        var blob = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        const blob = document.createElementNS("http://www.w3.org/2000/svg", "path");
         blob.setAttribute("d", pathData);
-        // calculate color
         const hslstr = hslsteps(fgColor, fgColor2, i, steps);
-        console.log(hslstr);
         blob.setAttribute("fill", hslstr);
-        // blob.setAttribute("fill-opacity", "0.1");
+        blob.setAttribute("stroke", "rgba(255,255,255,0.5)");
         const scale = 0.8 * Math.pow(0.8, i);
-        blob.setAttribute("transform", `scale(${scale} ${scale})`);
+        blob.setAttribute("transform", `translate(0 ${height/2}) scale(${scale} ${scale})`);
         blob.setAttribute("transform-origin", `${xOrigin} ${yOrigin}`);
-        console.log(`${i} - ${scale}`);
         container.appendChild(blob);
       }
     }
@@ -222,9 +212,9 @@
         l:(hsl2.l-hsl1.l)/steps
       }
       const hsl3 = {
-        h: hsl1.h + delta.h * i,
-        s: hsl1.s + delta.s * i,
-        l: hsl1.l + delta.l * i
+        h: hsl1.h + delta.h * (i+1),
+        s: hsl1.s + delta.s * (i+1),
+        l: hsl1.l + delta.l * (i+1)
       }
       return hsltoString(hsl3);
     }
