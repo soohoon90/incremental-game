@@ -38,9 +38,9 @@ svg {
 .color{
     width: 2em;
     height: 2em;
-    border-radius: 1em;
+    border-radius: 2em;
     margin: 0.5em;
-    border: 1px solid white;
+    border: 2px solid white;
     box-shadow: 0 0 4px rgba(0,0,0,0.6);
     display: inline-block;
 }

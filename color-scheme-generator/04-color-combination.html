@@ -20,9 +20,13 @@
       <input type="color" id="input__color" value="#fb3737" /><br />
       <div id="recent__color"></div>
 
+      delta H: <input type="range" id="input__h" value="20" min="-360" max="360" /><br />
+      delta S: <input type="range" id="input__s" value="0" min="-100" max="100"/><br />
+      delta L: <input type="range" id="input__l" value="0" min="-100" max="100"/><br />
+
       <label for="input__color2">color 2: </label>
       <input type="color" id="input__color2" value="#fb9637" /><br />
-      <div id="suggested__color"></div>
+      
 
       <label for="input__steps">steps: </label>
       <input type="range" id="input__steps" value="6" min="2" max="20" /><br />
@@ -168,50 +172,38 @@
         d.addEventListener("click", function () {
           document.getElementById("input__color").value = recentColors[i];
           document.getElementById("input__color").dispatchEvent(new Event('input', { 'bubbles': true }));
+          updateSliderBasedOnColor();
         });
       }
     }
 
-
-
-    function updateSuggestedColors() {
+    function updateColorsBasedOnSliders() {
       const c = document.getElementById("input__color").value;
+      const delta_h = parseInt(document.getElementById("input__h").value);
+      const delta_s = parseInt(document.getElementById("input__s").value);
+      const delta_l = parseInt(document.getElementById("input__l").value);
 
-      const suggestedDiv = document.getElementById("suggested__color");
-      suggestedDiv.innerHTML = "";
-
-      var suggestedColors = [];
       const hsl = hexToHSL(c);
-      console.log(hsl);
-      suggestedColors.push(hslToHex({ h: 0, s: hsl.s, l: hsl.l }));
-      suggestedColors.push(hslToHex({ h: 60, s: hsl.s, l: hsl.l }));
-      suggestedColors.push(hslToHex({ h: 120, s: hsl.s, l: hsl.l }));
-      suggestedColors.push(hslToHex({ h: 180, s: hsl.s, l: hsl.l }));
-      suggestedColors.push(hslToHex({ h: 240, s: hsl.s, l: hsl.l }));
-      suggestedColors.push(hslToHex({ h: 300, s: hsl.s, l: hsl.l }));
-      suggestedColors.push(hslToHex({ h: hsl.h, s: 20, l: hsl.l }));
-      suggestedColors.push(hslToHex({ h: hsl.h, s: 40, l: hsl.l }));
-      suggestedColors.push(hslToHex({ h: hsl.h, s: 60, l: hsl.l }));
-      suggestedColors.push(hslToHex({ h: hsl.h, s: 70, l: hsl.l }));
-      suggestedColors.push(hslToHex({ h: hsl.h, s: 80, l: hsl.l }));
-      suggestedColors.push(hslToHex({ h: hsl.h, s: 90, l: hsl.l }));
-      suggestedColors.push(hslToHex({ h: hsl.h, s: hsl.s, l: 10 }));
-      suggestedColors.push(hslToHex({ h: hsl.h, s: hsl.s, l: 30 }));
-      suggestedColors.push(hslToHex({ h: hsl.h, s: hsl.s, l: 50 }));
-      suggestedColors.push(hslToHex({ h: hsl.h, s: hsl.s, l: 70 }));
-      suggestedColors.push(hslToHex({ h: hsl.h, s: hsl.s, l: 90 }));
-      suggestedColors.push(hslToHex({ h: hsl.h, s: hsl.s, l: 100 }));
+      const hsl2 = {
+        h: (hsl.h + delta_h) % 360,
+        s: (hsl.s + (delta_s % 100) + 100) % 100,
+        l: (hsl.l + (delta_l % 100) + 100) % 100
+      };
 
-      for (let i = 0; i < suggestedColors.length; i++) {
-        const d = document.createElement("div");
-        d.setAttribute("class", "color");
-        d.setAttribute("style", "background-color:" + suggestedColors[i]);
-        suggestedDiv.appendChild(d);
-        d.addEventListener("click", function () {
-          document.getElementById("input__color2").value = suggestedColors[i];
-          document.getElementById("input__color2").dispatchEvent(new Event('input', { 'bubbles': true }));
-        });
-      }
+      document.getElementById("input__color2").value = hslToHex(hsl2);
+      generateSVG();
+    }
+
+    function updateSliderBasedOnColor(){
+      const c = document.getElementById("input__color").value;
+      const c2 = document.getElementById("input__color2").value;
+    
+      const hsl = hexToHSL(c);
+      const hsl2 = hexToHSL(c2);
+     
+      document.getElementById("input__h").value = hsl2.h - hsl.h; 
+      document.getElementById("input__s").value = hsl2.s - hsl.s; 
+      document.getElementById("input__l").value = hsl2.l - hsl.l; 
     }
 
 
@@ -219,13 +211,16 @@
     document.getElementById("input__color2").addEventListener("input", generateSVG);
     document.getElementById("input__steps").addEventListener("input", generateSVG);
 
+    document.getElementById("input__h").addEventListener("input", updateColorsBasedOnSliders);
+    document.getElementById("input__s").addEventListener("input", updateColorsBasedOnSliders);
+    document.getElementById("input__l").addEventListener("input", updateColorsBasedOnSliders);
 
     document.getElementById("input__color").addEventListener("blur", updateRecentColors);
-    document.getElementById("input__color").addEventListener("blur", updateSuggestedColors);
+    document.getElementById("input__color").addEventListener("blur", updateSliderBasedOnColor);
+    document.getElementById("input__color2").addEventListener("blur", updateSliderBasedOnColor);
 
     updateRecentColors();
-    updateSuggestedColors();
-    generateSVG();
+    updateColorsBasedOnSliders();
 
   </script>
 </body>
