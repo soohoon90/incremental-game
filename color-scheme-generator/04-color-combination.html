@@ -17,19 +17,23 @@
     <div id="colorPicker__Header">Color Picker</div>
     <form>
       <label for="input__color">color 1: </label>
-      <input type="color" id="input__color" value="#fb3737" /><br />
+      <input type="color" id="input__color" value="#fb3737" />
+      <span id="value__c1"></span><br />
       <div id="recent__color"></div>
 
-      delta H: <input type="range" id="input__h" value="20" min="-360" max="360" /><br />
-      delta S: <input type="range" id="input__s" value="0" min="-100" max="100"/><br />
-      delta L: <input type="range" id="input__l" value="0" min="-100" max="100"/><br />
+      delta H: <input type="range" id="input__h" value="20" min="-360" max="360" /><span id="value__h"></span><br />
+      delta S: <input type="range" id="input__s" value="0" min="-100" max="100"/><span id="value__s"></span><br />
+      delta L: <input type="range" id="input__l" value="0" min="-100" max="100"/><span id="value__l"></span><br />
 
       <label for="input__color2">color 2: </label>
-      <input type="color" id="input__color2" value="#fb9637" /><br />
+      <input type="color" id="input__color2" value="#fb9637" />
+      <span id="value__c2"></span><br />
       
 
-      <label for="input__steps">steps: </label>
-      <input type="range" id="input__steps" value="6" min="2" max="20" /><br />
+      <label for="input__steps">steps:</label>
+      <input type="range" id="input__steps" value="6" min="2" max="20" />
+      <span id="value__steps"></span>
+      <br />
     </form>
   </div>
 
@@ -57,7 +61,6 @@
 
         svgElement.appendChild(rect);
       }
-
     }
 
     function generateSVG() {
@@ -71,6 +74,7 @@
       // console.log(steps);
 
       fillSVGContainer("svg-container", c, c2, steps);
+      renderValues();
     }
 
 
@@ -126,9 +130,9 @@
         l: (hsl2.l - hsl1.l) / steps
       }
       const hsl3 = {
-        h: hsl1.h + delta.h * (i + 1),
-        s: hsl1.s + delta.s * (i + 1),
-        l: hsl1.l + delta.l * (i + 1)
+        h: hsl1.h + delta.h * (i ),
+        s: hsl1.s + delta.s * (i ),
+        l: hsl1.l + delta.l * (i )
       }
       return hsltoString(hsl3);
     }
@@ -184,14 +188,20 @@
       const delta_l = parseInt(document.getElementById("input__l").value);
 
       const hsl = hexToHSL(c);
+
+      // h: (hsl.h + delta_h) % 360,
+      // h: Math.max(0, Math.min(360, (hsl.h + delta_h))),
+
       const hsl2 = {
-        h: (hsl.h + delta_h) % 360,
-        s: (hsl.s + (delta_s % 100) + 100) % 100,
-        l: (hsl.l + (delta_l % 100) + 100) % 100
+        h: Math.max(0, Math.min(360, (hsl.h + delta_h))),
+        s: Math.max(0, Math.min(100, (hsl.s + delta_s))),
+        l: Math.max(0, Math.min(100, (hsl.l + delta_l)))
       };
+      console.log(`input_s=${hsl.s} / delta=${delta_s} / output_s=${hsl2.s}`);
 
       document.getElementById("input__color2").value = hslToHex(hsl2);
       generateSVG();
+      renderValues();
     }
 
     function updateSliderBasedOnColor(){
@@ -204,6 +214,23 @@
       document.getElementById("input__h").value = hsl2.h - hsl.h; 
       document.getElementById("input__s").value = hsl2.s - hsl.s; 
       document.getElementById("input__l").value = hsl2.l - hsl.l; 
+      renderValues();
+    }
+
+    function renderValues(){
+      const c = document.getElementById("input__color").value;
+      const hsl = hsltoString(hexToHSL(c));
+      document.getElementById("value__c1").innerHTML = c+"<br>"+hsl; 
+
+      const c2 = document.getElementById("input__color2").value;
+      const hsl2 = hsltoString(hexToHSL(c2));
+      document.getElementById("value__c2").innerHTML = c2+"<br>"+hsl2;
+
+      document.getElementById("value__h").innerHTML = document.getElementById("input__h").value;
+      document.getElementById("value__s").innerHTML = document.getElementById("input__s").value;
+      document.getElementById("value__l").innerHTML = document.getElementById("input__l").value;
+
+      document.getElementById("value__steps").innerHTML = document.getElementById("input__steps").value;
     }
 
 
@@ -211,12 +238,13 @@
     document.getElementById("input__color2").addEventListener("input", generateSVG);
     document.getElementById("input__steps").addEventListener("input", generateSVG);
 
+    document.getElementById("input__color").addEventListener("input", updateColorsBasedOnSliders);
+
     document.getElementById("input__h").addEventListener("input", updateColorsBasedOnSliders);
     document.getElementById("input__s").addEventListener("input", updateColorsBasedOnSliders);
     document.getElementById("input__l").addEventListener("input", updateColorsBasedOnSliders);
 
     document.getElementById("input__color").addEventListener("blur", updateRecentColors);
-    document.getElementById("input__color").addEventListener("blur", updateSliderBasedOnColor);
     document.getElementById("input__color2").addEventListener("blur", updateSliderBasedOnColor);
 
     updateRecentColors();
