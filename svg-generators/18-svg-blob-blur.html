@@ -19,9 +19,6 @@
     Primary Color: <br />
     <input type="color" id="fgcolor" value="#2196F3" /><br />
 
-    Secondary Color: <br />
-    <input type="color" id="fgcolor2" value="#bb22ff" /><br />
-
     radius: <br />
     <input type="range" id="radius" value="0" min="-100" max="100" /><br />
 
@@ -32,11 +29,11 @@
     <input type="range" id="num_points" value="7" min="3" max="12" /><br />
 
     direction: <br />
-    <input type="range" id="direction" value="45" min="0" max="360" /><br />
+    <input type="range" id="direction" value="90" min="0" max="359" /><br />
 
-    margin:
-    <input type="range" id="margin" value="5" min="0" max="50" /><br />
- 
+    blur:
+    <input type="range" id="blur" value="25" min="0" max="100" /><br />
+
   </div>
 
   <script>
@@ -66,26 +63,25 @@
       container.innerHTML = "";
 
       const fgColor = inputs['fgcolor'];
-      const fgColor2 = inputs['fgcolor2'];
       const bgColor = inputs['bgcolor'];
       const radius = parseInt(inputs['radius']);
       const variance = parseInt(inputs['variance']);
       const numPoints = parseInt(inputs['num_points']);
-      const direction = parseInt(inputs['direction']);
-      const margin = parseInt(inputs['margin']);
-
-      // console.log(`direction is ${direction} x is ${directed_x} y is ${directed_y}`); 
-
-      const off1 = `${margin}%`;
-      const off2 = `${100-margin}%`;
-
-      // console.log(`o1 ${off1} and o2 ${off2}`);
+      const directions = parseInt(inputs['direction']);
+      const blur = parseInt(inputs['blur']);
 
       const grdef = `<defs>
-      <linearGradient id="gradient" gradientTransform="rotate(${direction} 0.5 0.5)">
-      <stop offset="${off1}" stop-color="${fgColor}" stop-opacity="1"/>
-      <stop offset="${off2}" stop-color="${fgColor2}" stop-opacity="1"/>
+      <linearGradient id="gradient" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="25%" stop-color="${fgColor}" stop-opacity="1"/>
+      <stop offset="75%" stop-color="${fgColor}" stop-opacity="0"/>
       </linearGradient>
+      <linearGradient id="gradient2" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0%" stop-color="${fgColor}" stop-opacity="0"/>
+      <stop offset="100%" stop-color="${fgColor}" stop-opacity="1"/>
+      </linearGradient>
+      <filter id="blur" x="-200%" y="-200%" width="400%" height="400%" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="${blur}"/>
+      </filter>
       </defs>`;
 
       container.innerHTML = grdef;
@@ -123,7 +119,7 @@
         let xVal = xOrigin + varied_radius * Math.cos(angle * j);
         let yVal = yOrigin + varied_radius * Math.sin(angle * j);
 
-        // console.log(xVal, yVal);
+        console.log(xVal, yVal);
         // container.appendChild(Dot(xVal, yVal, "blue"));
         points.push({ x: xVal, y: yVal });
       }
@@ -168,6 +164,11 @@
       blob.setAttribute("fill", "url(#gradient)");
       container.appendChild(blob);
 
+      var blob = document.createElementNS("http://www.w3.org/2000/svg", "path");
+      blob.setAttribute("d", pathData);
+      blob.setAttribute("fill", "url(#gradient2)");
+      blob.setAttribute("filter", "url(#blur)");
+      container.appendChild(blob);
     }
 
 
