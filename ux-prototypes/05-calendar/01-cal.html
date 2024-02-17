@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calendar</title>
+  <link rel="preconnect" href="https://rsms.me/">
+  <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+
+  <style>
+    :root {
+      font-family: Inter, sans-serif;
+      font-feature-settings: 'liga' 1, 'calt' 1;
+      /* fix for Chrome */
+    }
+
+    @supports (font-variation-settings: normal) {
+      :root {
+        font-family: InterVariable, sans-serif;
+      }
+    }
+
+    .day{
+      text-align: center;
+      display: block;
+      width: 2em;
+      height: 2em;
+      
+    }
+    .today{
+      background-color: red;
+      color: white;
+      border-radius: 100%;
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+  <div id="calendar-container">
+
+  </div>
+
+  <script>
+
+    // Get today's date
+    const today = new Date();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+
+    // Function to create a calendar
+    function createCalendar(containerId) {
+      const container = document.getElementById(containerId);
+      const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      const date = new Date(currentYear, currentMonth, 1);
+      const endDate = new Date(currentYear, currentMonth + 1, 0);
+      let calendarHtml = '<table>';
+
+      // Create table header
+      calendarHtml += '<tr>';
+      for (let i = 0; i < days.length; i++) {
+        calendarHtml += `<th>${days[i]}</th>`;
+      }
+      calendarHtml += '</tr>';
+
+      // Create the rest of the calendar
+      for (let i = 0; i < date.getDay(); i++) {
+        if (i === 0) calendarHtml += '<tr>';
+        calendarHtml += '<td></td>';
+      }
+
+      for (let i = 1; i <= endDate.getDate(); i++) {
+        if (date.getDay() === 0) calendarHtml += '<tr>';
+        if (today.getDate() === i && today.getMonth() === currentMonth) {
+          calendarHtml += `<td><span class="day today">${i}</span></td>`;
+        } else {
+          calendarHtml += `<td><span class="day">${i}</span></td>`;
+        }
+        if (date.getDay() === 6) calendarHtml += '</tr>';
+        date.setDate(date.getDate() + 1);
+      }
+
+      calendarHtml += '</table>';
+      container.innerHTML = calendarHtml;
+    }
+
+    // Call the function with the ID of your container
+    createCalendar('calendar-container');
+
+
+  </script>
+</body>
+
+</html>
