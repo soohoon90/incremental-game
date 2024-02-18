@@ -4,16 +4,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Colorful Star</title>
-  <style>
-    svg {
-      border: 1px solid blue;
-      max-width: 90%;
-      max-height: 90vh;
-      margin: 10px auto;
-      display: block;
-    }
-  </style>
+  <title>Colorful Background</title>
+  <link rel="stylesheet" href="svg-generators.css">
 </head>
 
 <body>
@@ -22,12 +14,6 @@
   <div id="controls">
     Background Color: <br />
     <input type="color" id="bgcolor" value="#BCCCD3" /><br />
-
-    Primary Color: <br />
-    <input type="color" id="fgcolor" value="#2196F3" /><br />
-
-    steps: <br />
-    <input type="range" id="steps" value="1" min="1" max="100" /><br />
   </div>
 
   <script>
@@ -38,19 +24,15 @@
 
     function generateUsingInput() {
       const bg = document.getElementById("bgcolor").value;
-      const fg = document.getElementById("fgcolor").value;
-      const steps = parseInt(document.getElementById("steps").value);
 
       console.log("generating...");
 
-      createColorfulBlobs("svg-container", bg, fg, steps);
+      createColorfulBlobs("svg-container", bg);
     }
 
     function createColorfulBlobs(
       containerId,
-      bgColor,
-      fgColor,
-      steps
+      bgColor
     ) {
       const container = document.getElementById(containerId);
       const { x, y, width, height } = container.viewBox.baseVal;
@@ -66,20 +48,6 @@
       bgrect.setAttribute("height", height);
       bgrect.setAttribute("fill", bgColor);
       container.appendChild(bgrect);
-
-      for (let i = 0; i < steps; i++) {
-
-        const bgrect = document.createElementNS(
-          "http://www.w3.org/2000/svg",
-          "rect"
-        );
-        bgrect.setAttribute("width", width);
-        bgrect.setAttribute("height", height);
-        bgrect.setAttribute("fill", bgColor);
-        container.appendChild(bgrect);
-
-        container.appendChild(blob);
-      }
     }
 
     // initial render

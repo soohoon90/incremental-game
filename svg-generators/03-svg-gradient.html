@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gradient Background</title>
+  <link rel="stylesheet" href="svg-generators.css">
+
+</head>
+
+<body>
+  <svg id="svg-container" viewBox="0 0 1600 900"></svg>
+
+  <div id="controls">
+
+    Primary Color: <br />
+    <input type="color" id="fgcolor" value="#2196F3" /><br />
+
+    Secondary Color: <br />
+    <input type="color" id="fgcolor2" value="#bb22ff" /><br />
+
+    direction: <br />
+    <input type="range" id="direction" value="45" min="0" max="360" /><br />
+
+    margin:
+    <input type="range" id="margin" value="5" min="0" max="50" /><br />
+ 
+  </div>
+
+  <script>
+    const inputs = document.getElementsByTagName("input");
+    for (const el of Array.from(inputs)) {
+      el.addEventListener("input", generateUsingInput);
+    }
+
+    function generateUsingInput() {
+      const inputs = document.getElementsByTagName("input");
+      var input_array = new Array();
+      for (const el of Array.from(inputs)) {
+        // console.log(`${el.id} has value ${el.value}`);
+        input_array[el.id] = el.value;
+      }
+      // console.log(input_array);
+
+      console.log("generating...");
+      console.log(input_array);
+      createColorfulBlobs("svg-container", input_array);
+    }
+
+    function createColorfulBlobs(containerId, inputs) {
+      const container = document.getElementById(containerId);
+      const { x, y, width, height } = container.viewBox.baseVal;
+
+      container.innerHTML = "";
+
+      const fgColor = inputs['fgcolor'];
+      const fgColor2 = inputs['fgcolor2'];
+
+      const direction = parseInt(inputs['direction']);
+      const margin = parseInt(inputs['margin']);
+
+      // console.log(`direction is ${direction} x is ${directed_x} y is ${directed_y}`); 
+
+      const off1 = `${margin}%`;
+      const off2 = `${100-margin}%`;
+
+      // console.log(`o1 ${off1} and o2 ${off2}`);
+
+      const grdef = `<defs>
+      <linearGradient id="gradient" gradientTransform="rotate(${direction} 0.5 0.5)">
+      <stop offset="${off1}" stop-color="${fgColor}" stop-opacity="1"/>
+      <stop offset="${off2}" stop-color="${fgColor2}" stop-opacity="1"/>
+      </linearGradient>
+      </defs>`;
+
+      container.innerHTML = grdef;
+
+
+      const bgrect = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "rect"
+      );
+      bgrect.setAttribute("width", width);
+      bgrect.setAttribute("height", height);
+      bgrect.setAttribute("fill", "url(#gradient)");
+      container.appendChild(bgrect);
+
+    }
+
+
+    // initial render
+    generateUsingInput();
+  </script>
+</body>
+
+</html>

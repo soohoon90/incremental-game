@@ -20,6 +20,9 @@
 
       Steps: <br />
       <input type="range" id="steps" value="7" min="2" max="15" /><br />
+
+      Angle: <br />
+      <input type="range" id="angle" value="90" min="0" max="360" /><br />
     </div>
 
 
@@ -49,6 +52,7 @@
       const fgColor = inputs['bgcolor'];
       const fgColor2 = inputs['fgcolor'];
       const steps = parseInt(inputs['steps']);
+      const angle = parseInt(inputs['angle']);
 
       const container = document.getElementById(containerId);
       const { x, y, width, height } = container.viewBox.baseVal;
@@ -67,17 +71,22 @@
       container.appendChild(bgrect);
 
       const rect_width = width / steps;
+      const direction = angle * Math.PI / 180;
+
+      const maxlength = Math.max(width, height) * 2;
 
       for (let i = 0; i < steps; i++) {
         const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
         rect.setAttribute("x", rect_width * i);
-        rect.setAttribute("y", 0);
+        rect.setAttribute("y", maxlength * -1/2);
         rect.setAttribute("width", rect_width);
-        rect.setAttribute("height", height);
+        rect.setAttribute("height", maxlength);
 
         // calculate color
         const hslstr = hslsteps(fgColor, fgColor2, i, steps);
         rect.setAttribute("fill", hslstr);
+        rect.setAttribute("transform", `rotate(${angle})`);
+        rect.setAttribute("transform-origin", `${width/2} ${height/2}`);
         container.appendChild(rect);
       }
     }
