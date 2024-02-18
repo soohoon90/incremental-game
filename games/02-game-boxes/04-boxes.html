@@ -4,93 +4,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>Craft Tycoon</title>
   <link rel="preconnect" href="https://rsms.me/">
   <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
-
-  <style>
-    :root {
-      font-family: Inter, sans-serif;
-      font-feature-settings: 'liga' 1, 'calt' 1;
-      /* fix for Chrome */
-    }
-
-    @supports (font-variation-settings: normal) {
-      :root {
-        font-family: InterVariable, sans-serif;
-      }
-    }
-
-    #scores div{
-      display: block;
-      width: 100%;
-
-      padding: 10px;
-      border-radius: 10px;
-      margin-inline: 10px;
-
-      background-color: white;
-      border: 1px solid #efefef;
-      text-align: left;
-    }
-
-    #container {
-      display: flex;
-      gap: 10px;
-      padding: 10px;
-      margin: 10px;
-      border-radius: 10px;
-      border: 1px solid #eeee;
-    }
-
-    #container div{
-      min-width: 200px;
-      padding: 5px;
-      margin: 5px;
-    }
-
-    #upgrades button, #controls button {
-      display: block;
-      width: 100%;
-
-      padding: 10px;
-      border-radius: 10px;
-
-      background-color: white;
-      border: 1px solid #efefef;
-      text-align: left;
-    }
-    
-    #queue_number{
-      font-weight:300;
-      font-size: 14px;
-      color: #666;
-    }
-
-    .hidden {
-      animation: disappear .3s forwards;
-    }
-
-    @keyframes disappear {
-      to {
-        opacity: 0;
-        visibility: hidden;
-      }
-    }
-
-    svg {
-      font-size: 10px;
-    }
-
-  </style>
+  <link rel="stylesheet" href="boxes.css">
 </head>
 
 <body>
 
+  <div id="appHeader">
+    <h1>Craft Tycoon</h1>
+  </div>
   <div id="container">
     <div id="scores"></div>
-    <div id="upgrades">
-      <h2>Upgrades</h2>
+    <div id="materials">
+      <h2>Materials</h2>
     </div>
     <div id="controls">
       <h2>Craft</h2>
@@ -102,83 +30,162 @@
 
   <script>
     var gamedata = {
+      level: 1,
+      exp: 0,
+      money: 20,
+
+      material: 5,
       material_max: 10,
-      craft_max: 2,
-      materials: 5,
+      material_level: 1,
+
       leather: 0,
       leather_max: 0,
+      leather_level: 0,
+
       rock: 0,
       rock_max: 0,
+      rock_level: 0,
+
       wood: 0,
       wood_max: 0,
-      money: 0,
+      wood_level: 0,
+
+      herb: 0,
+      herb_max: 0,
+      herb_level: 0,
+
       crafting: 0,
+      crafting_max: 2,
+      crafting_level: 1,
+
       upgrading: 0,
-      upgrade_max: 1,
-      upgrade_material:0,
-      upgrade_craft:0
+      upgrading_max: 1
     };
+
+    const material_list = [
+      'material', 'leather', 'rock', 'wood', 'herb'
+    ];
+
+    const material_baseline = {
+      "material": 0.4,
+      "leather": 0.05,
+      "rock": 0.05,
+      "wood": 0.05,
+      "herb": 0.05
+    };
+
+    const material_cost = {
+      "material": 100,
+      "leather": 300,
+      "rock": 300,
+      "wood": 300,
+      "herb": 300
+    };
+
+
+    // use material levels to calculate how much to mine
+    // update buttons for upgrades based on level and money available
+    // and if the upgrading queue is full 
+    function updateMaterialAndUpgrades() {
+      material_list.forEach(function (ea) {
+        const lvl = parseInt(gamedata[ea + "_level"]);
+        const max = parseInt(gamedata[ea + "_max"]);
+        const increment = parseFloat(material_baseline[ea]) * lvl;
+        const cost = parseInt(material_cost[ea]);
+        const calculated_cost = (lvl * lvl + lvl) / 2 * cost + cost;
+        const calculated_time = (lvl * lvl + lvl) / 2 * 60 * 60;
+
+        // increase the material based on baseline and lvl amount
+        gamedata[ea] += increment;
+        if (gamedata[ea] > max) {
+          gamedata[ea] = max;
+        }
+
+        // update the amount displayed
+        let div = document.querySelector("#" + ea + "_amount");
+        if (div) {
+          div.innerHTML = `${ea}: ${gamedata[ea].toFixed(1)} / ${gamedata[ea + "_max"].toFixed(1)} <small>(+${increment.toFixed(2)})</small>`;
+        }
+
+        // scores.innerHTML += `<div>Crafting ${gamedata.crafting} / ${gamedata.crafting_max}</div>`;
+
+
+        let button = document.querySelector("#" + ea + "_upgrade");
+        if (button) {
+          button.innerHTML = `Upgrade <b>${ea}</b> gathering <br />(Current level: ${lvl} / Cost: $${calculated_cost}`;
+
+          button.dataset.type = ea;
+          button.dataset.cost = calculated_cost;
+          button.dataset.length = calculated_time;
+
+          if (button.dataset.cost > gamedata.money || gamedata.upgrading >= gamedata.upgrading_max) {
+            button.disabled = true;
+          } else {
+            button.disabled = false;
+          }
+        }
+      });
+
+    }
 
     function updateScores() {
       const scores = document.querySelector("#scores");
       scores.innerHTML = "";
-
       scores.innerHTML += `<h2>Stats</h2>`;
 
+      // crafting queue
       gamedata.crafting = document.querySelectorAll('svg').length
+      document.querySelector("#queue_number").innerHTML = `${gamedata.crafting} / ${gamedata.crafting_max}`;
 
-      document.querySelector("#queue_number").innerHTML = `${gamedata.crafting} / ${gamedata.craft_max}`;
-      // scores.innerHTML += `<div>Crafting ${gamedata.crafting} / ${gamedata.craft_max}</div>`;
-      scores.innerHTML += `<div>Materials ${gamedata.materials} / ${gamedata.material_max} </div>`;
+      // scores.innerHTML += `<div>Crafting ${gamedata.crafting} / ${gamedata.crafting_max}</div>`;
       scores.innerHTML += `<div>$ ${gamedata.money}</div>`;
+      scores.innerHTML += `<div>Level: ${gamedata.level}</div>`;
+      scores.innerHTML += `<div>Experience: ${gamedata.exp}</div>`;
 
-      //   for (let key in gamedata) {
-      //     scores.innerHTML += `${key}: ${gamedata[key]}<br>`;
-      //   }
-
+      // for (let key in gamedata) {
+      //   scores.innerHTML += `${key}: ${gamedata[key]}<br>`;
+      // }
       const craftButtons = document.querySelectorAll("#controls button");
       craftButtons.forEach(function (current) {
-        if (current.dataset.cost > gamedata.materials || gamedata.crafting >= gamedata.craft_max) {
+        if (current.dataset.cost > gamedata.material || gamedata.crafting >= gamedata.crafting_max
+          || current.dataset.leather > gamedata.leather || current.dataset.herb > gamedata.herb
+          || current.dataset.wood > gamedata.wood || current.dataset.rock > gamedata.rock
+        ) {
           current.disabled = true;
         } else {
           current.disabled = false;
-
-        }
-      });
-
-      const upgradeButtons = document.querySelectorAll("#upgrades button");
-      upgradeButtons.forEach(function (current) {
-        if (current.dataset.cost > gamedata.money || gamedata.upgrading >= gamedata.max_upgrade) {
-          current.disabled = true;
-        } else {
-          current.disabled = false;
-
         }
       });
     }
 
-    var miningMaterial = setInterval(function () {
-      gamedata.materials++;
-      if (gamedata.materials > gamedata.material_max) {
-        gamedata.materials = gamedata.material_max
-      }
-      updateScores();
-    }, 1000);
-
     function createButtonForCraftItem(item) {
       const itemName = item.name;
       const materialCost = item.cost;
+
       const timerLength = parseInt(item.seconds);
       const price = parseInt(item.price);
 
       // Create a button element
       var button = document.createElement("button");
-      button.innerHTML = `Create a <b>${itemName}</b> <br /> (material: ${materialCost} / time: ${timerLength})`;
+      button.innerHTML = `<b>${itemName}</b>`;
 
-      button.dataset.name = itemName;
-      button.dataset.cost = materialCost;
-      button.dataset.timer = timerLength;
+      button.innerHTML += `<br /> time: ${timerLength} / price: $${item.price} <br/>`;
+      button.innerHTML += "<small>";
+      button.innerHTML += `material: ${materialCost}`;
+      button.innerHTML += item.leather ? ` / leather: ${item.leather}` : "";
+      button.innerHTML += item.wood ? ` / wood: ${item.wood}` : "";
+      button.innerHTML += item.rock ? ` / rock: ${item.rock}` : "";
+      button.innerHTML += item.herb ? ` / herb: ${item.herb}` : "";
+      button.innerHTML += "</small>";
 
+      button.dataset.name = item.name;
+      button.dataset.cost = item.cost;
+      button.dataset.seconds = parseInt(item.seconds);
+      button.dataset.leather = item.leather;
+      button.dataset.wood = item.wood;
+      button.dataset.rock = item.rock;
+      button.dataset.herb = item.herb;
+      button.dataset.price = item.price;
 
       // Append the button to the Controls
       document.querySelector("#controls").appendChild(button);
@@ -186,18 +193,18 @@
       // Add a click event listener to the button
       button.addEventListener("click", function (evt) {
 
-        // check if enough materials
-        if (button.dataset.cost > gamedata.materials) {
+        // check if enough material
+        if (materialCost > gamedata.material) {
           return;
         }
 
         // check if the queue is full
-        if (gamedata.crafting >= gamedata.craft_max) {
+        if (gamedata.crafting >= gamedata.crafting_max) {
           return;
         }
 
         // proceed with crafting -- take cost
-        gamedata.materials -= parseInt(button.dataset.cost);
+        gamedata.material -= parseInt(button.dataset.cost);
 
         // Create a new svg timer element
         var xmlns = "http://www.w3.org/2000/svg";
@@ -210,21 +217,27 @@
         svgElem.setAttribute("width", boxWidth);
 
         // Convert the timer text to seconds
-        var seconds = evt.currentTarget.dataset.timer;
+        const seconds = evt.currentTarget.dataset.seconds;
         var remaining = seconds;
         var progress = remaining / seconds * 100;
 
         svgElem.dataset.timer = seconds;
         const bgrect = document.createElementNS(xmlns, "rect");
-        
         bgrect.setAttribute("x", 10);
-        bgrect.setAttribute("y", 10);
+        bgrect.setAttribute("y", 0);
         bgrect.setAttribute("width", boxWidth - 20);
-        bgrect.setAttribute("height", boxHeight - 20);
+        bgrect.setAttribute("height", boxHeight);
         bgrect.setAttribute("rx", 10);
-
-        bgrect.setAttribute("fill", "#eeeeee");
+        bgrect.setAttribute("fill", "#ddd");
         svgElem.appendChild(bgrect);
+
+        const bgcircle = document.createElementNS(xmlns, "circle");
+        bgcircle.setAttribute("r", radius);
+        bgcircle.setAttribute("cx", boxWidth / 2);
+        bgcircle.setAttribute("cy", boxHeight / 2);
+        bgcircle.setAttribute("fill", "#fefefe");
+        bgcircle.setAttribute("pointer-events", "none");
+        svgElem.appendChild(bgcircle);
 
         const ring = document.createElementNS(xmlns, "circle");
         var circumference = 2 * Math.PI * radius;
@@ -246,21 +259,24 @@
         t.setAttribute("y", boxHeight / 2);
         t.setAttribute("text-anchor", "middle");
         t.setAttribute("dominant-baseline", "middle");
+        t.setAttribute("pointer-events", "none");
         t.innerHTML = seconds;
         svgElem.appendChild(t);
 
         const t2 = document.createElementNS(xmlns, "text");
         t2.setAttribute("x", boxWidth / 2);
-        t2.setAttribute("y", boxHeight / 2 + 14);
+        t2.setAttribute("y", boxHeight - 20);
         t2.setAttribute("text-anchor", "middle");
         t2.setAttribute("dominant-baseline", "middle");
+        t2.setAttribute("pointer-events", "none");
         svgElem.appendChild(t2);
 
         const t3 = document.createElementNS(xmlns, "text");
         t3.setAttribute("x", boxWidth / 2);
-        t3.setAttribute("y", 24); 
+        t3.setAttribute("y", 24);
         t3.setAttribute("text-anchor", "middle");
         t3.setAttribute("dominant-baseline", "middle");
+        t3.setAttribute("pointer-events", "none");
         t3.innerHTML = itemName;
         svgElem.appendChild(t3);
 
@@ -286,9 +302,11 @@
             clearInterval(interval);
 
             // Change the timer background to yellow
-            t.innerHTML = `Done`;
-            t2.innerHTML = `(${price})`;
-            bgrect.setAttribute("fill", "yellow");
+            t.innerHTML = `DONE`;
+            t2.innerHTML = `Sell for $${button.dataset.price}`;
+            // bgcircle.setAttribute("fill", "white");
+            bgrect.setAttribute("class", "svghover");
+            // svgElem.setAttribute("style", "cursor:pointer")
             ring.setAttribute("stroke", "none");
           }
         };
@@ -296,6 +314,7 @@
         svgElem.addEventListener("click", function (evt) {
           if (remaining <= 0) {
             gamedata.money += parseInt(price);
+            gamedata.exp += parseInt(price);
             svgElem.addEventListener('animationend', function () { svgElem.remove(); });
             svgElem.classList.add('hidden');
             updateScores();
@@ -309,41 +328,61 @@
       });
     }
 
-    function createButtonForUpgrades(upgrade){
+    function createButtonForUpgrades(upgrade) {
       const type = upgrade.type;
-      const cost = upgrade.cost;
-      const length = parseInt(upgrade.seconds);      
+
+      // Create a div element
+      var d = document.createElement("div");
+      d.setAttribute("id", type + "_amount");
+      // d.innerHTML = `${gamedata[type]}`;
+      document.querySelector("#materials").appendChild(d);
 
       // Create a button element
       var button = document.createElement("button");
-      button.innerHTML = `upgrade a <b>${type}</b> <br /> (money: ${cost} / time: ${length})`;
-      button.dataset.cost = cost;
+      button.setAttribute("id", type + "_upgrade");
+      // button.innerHTML = `Upgrade <b>${type}</b>`;
 
       // Append the button to the Controls
-      document.querySelector("#upgrades").appendChild(button);
+      document.querySelector("#materials").appendChild(button);
 
       // Add a click event listener to the button
       button.addEventListener("click", function (evt) {
-        alert(`clicked: upgrade a ${type} (money: ${cost} / time: ${length})`);
+
+        gamedata.money -= button.dataset.cost;
+
+        gamedata[type + "_level"] += 1;
+        gamedata[type + "_max"] += 5;
+
+        alert(`Upgraded ${type} now level: ${gamedata[type + "_level"]}`);
+
       });
     };
 
-    createButtonForCraftItem({ name: "Sword", cost: 5, seconds: 15, price: 52 });
-    createButtonForCraftItem({ name: "Bigger sword", cost: 11, seconds: 30, price: 150 });
+    createButtonForCraftItem({ name: "Sword", cost: 4, seconds: 8, price: 42, leather: 0, wood: 0, herb: 0, rock: 0 });
+    createButtonForCraftItem({ name: "Dagger", cost: 3, seconds: 7, price: 33, leather: 0, wood: 0, herb: 0, rock: 0 });
 
-    createButtonForCraftItem({ name: "Axe", cost: 4, seconds: 12, price: 38 });
-    createButtonForCraftItem({ name: "Dagger", cost: 3, seconds: 10, price: 37 });
-    
-    createButtonForCraftItem({ name: "Light Armor", cost: 4, seconds: 20, price: 44 });
-    createButtonForCraftItem({ name: "Heavy Armor", cost: 11, seconds: 30, price: 150 });
+    createButtonForCraftItem({ name: "Axe", cost: 7, seconds: 8, price: 98, leather: 0, wood: 0, herb: 0, rock: 1 });
+    createButtonForCraftItem({ name: "Shield", cost: 7, seconds: 11, price: 146, leather: 0, wood: 2, herb: 0, rock: 0 });
+    createButtonForCraftItem({ name: "Light Armor", cost: 7, seconds: 17, price: 184, leather: 2, wood: 0, herb: 0, rock: 0 });
+    createButtonForCraftItem({ name: "Medicine", cost: 7, seconds: 15, price: 220, leather: 0, wood: 0, herb: 2, rock: 0 });
 
-    createButtonForCraftItem({ name: "Medicine", cost: 2, seconds: 8, price: 20 });
-    createButtonForCraftItem({ name: "Shield", cost: 3, seconds: 11, price: 36 });
+    createButtonForCraftItem({ name: "Bigger sword", cost: 11, seconds: 30, price: 390, leather: 0, wood: 0, herb: 0, rock: 3 });
+    createButtonForCraftItem({ name: "Heavy Armor", cost: 11, seconds: 30, price: 450, leather: 4, wood: 0, herb: 0, rock: 0 });
 
-    createButtonForUpgrades({ type: "material" });
-    createButtonForUpgrades({ type: "craft" });
+    material_list.forEach(function (ea) {
+      createButtonForUpgrades({ type: ea });
+      console.log("created " + ea + " button");
+    });
 
+    updateMaterialAndUpgrades();
     updateScores();
+
+    // get resources and update stuff every second
+    setInterval(function () {
+      updateMaterialAndUpgrades();
+      updateScores();
+    }, 1000);
+
 
   </script>
 </body>

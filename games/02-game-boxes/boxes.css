@@ -1,0 +1,96 @@
+:root {
+  font-family: Inter, sans-serif;
+  font-feature-settings: 'liga' 1, 'calt' 1;
+  /* fix for Chrome */
+}
+
+@supports (font-variation-settings: normal) {
+  :root {
+    font-family: InterVariable, sans-serif;
+  }
+}
+
+body{
+  background:linear-gradient(90deg, rgba(71, 31, 98, 0.8) 0%, rgba(88, 9, 9, 0.8) 50%, rgba(92, 57, 8, 0.8) 100%);
+}
+
+#appHeader{
+  color: white;
+  text-align: center;
+  text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+}
+#scores div{
+  display: block;
+  width: 100%;
+
+  padding: 10px;
+  border-radius: 10px;
+  margin-inline: 10px;
+
+  background-color: white;
+  border: 1px solid #efefef;
+  text-align: left;
+}
+
+#container {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  margin: 10px;
+  border-radius: 10px;
+  border: 1px solid #eeee;
+  background-color: rgba( 250,250,250,.9);
+}
+
+#container div{
+  min-width: 200px;
+  padding: 5px;
+  margin: 5px;
+}
+
+#materials button, #upgrades button, #controls button {
+  display: block;
+  width: 100%;
+
+  padding: 10px;
+  border-radius: 10px;
+
+  background-color: white;
+  border: 1px solid #efefef;
+  text-align: left;
+}
+
+#materials button:hover:enabled ,#controls button:hover:enabled{
+  background-color: rgb(179, 234, 173);
+  cursor:pointer;
+}
+
+#queue_number{
+  font-weight:300;
+  font-size: 14px;
+  color: #666;
+}
+
+.svghover{
+  fill: rgb(202, 223, 199);
+}
+
+.svghover:hover{
+  fill: rgb(152, 223, 144);
+  cursor:pointer;
+}
+
+.hidden {
+  animation: disappear .3s forwards;
+}
+
+@keyframes disappear {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+svg {
+  font-size: 10px;
+}
