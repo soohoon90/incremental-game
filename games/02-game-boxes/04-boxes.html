@@ -114,7 +114,9 @@
       money: 0,
       crafting: 0,
       upgrading: 0,
-      upgrade_max: 1
+      upgrade_max: 1,
+      upgrade_material:0,
+      upgrade_craft:0
     };
 
     function updateScores() {
@@ -153,9 +155,6 @@
 
         }
       });
-
-
-
     }
 
     var miningMaterial = setInterval(function () {
@@ -341,8 +340,8 @@
     createButtonForCraftItem({ name: "Medicine", cost: 2, seconds: 8, price: 20 });
     createButtonForCraftItem({ name: "Shield", cost: 3, seconds: 11, price: 36 });
 
-    createButtonForUpgrades({ type: "material_max", cost: 100, seconds: 15, price: 50 });
-
+    createButtonForUpgrades({ type: "material" });
+    createButtonForUpgrades({ type: "craft" });
 
     updateScores();
 
