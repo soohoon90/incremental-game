@@ -4,8 +4,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Single Spline Diagonal</title>
-  <link rel="stylesheet" href="svg-generators.css">
+  <title>Single Spline</title>
+  <link rel="stylesheet" href="../svg-generators.css">
 </head>
 
 <body>
@@ -19,16 +19,10 @@
     <input type="color" id="fgcolor" value="#2196F3" /><br />
 
     variance: <br />
-    <input type="range" id="variance" value="20" min="0" max="100" /><br />
+    <input type="range" id="variance" value="30" min="0" max="100" /><br />
 
     num_points: <br />
-    <input type="range" id="num_points" value="6" min="3" max="12" /><br />
-
-    starting point: <br />
-    <input type="range" id="start" value="25" min="0" max="100" /><br />
-
-    end point: <br /> 
-    <input type="range" id="end" value="75" min="0" max="100" /><br />
+    <input type="range" id="num_points" value="5" min="3" max="12" /><br />
   </div>
 
   <script>
@@ -43,17 +37,9 @@
       const numPoints = parseInt(document.getElementById("num_points").value);
       const variance = parseInt(document.getElementById("variance").value);
 
-      const inputs = document.getElementsByTagName("input");
-      var input_array = new Array();
-      for (const el of Array.from(inputs)) {
-        // console.log(`${el.id} has value ${el.value}`);
-        input_array[el.id] = el.value;
-      }
-      // console.log(input_array);
-
       console.log("generating...");
 
-      createSpline("svg-container", input_array);
+      createColorfulBlobs("svg-container", bg, fg, numPoints, variance);
     }
 
     function Dot(x, y, color) {
@@ -96,65 +82,23 @@
       return c;
     }
 
-    function Curves(points, cx, cy, color){
-      
-      var path = `M ${points[0].x} ${points[0].y}`;
-      // console.log(cx);
-      // console.log(cy);
-
-      var min_x = points[0].x;
-      var min_y = points[0].y;
-      var max_x = points[0].x;
-      var max_y = points[0].y;
-
-      for (i=1; i < points.length; i++){
-        path += `C ${cx.p1[i-1]} ${cy.p1[i-1]} ${cx.p2[i-1]} ${cy.p2[i-1]} ${points[i].x} ${points[i].y}`;
-
-        if (min_x > points[i].x) min_x = points[i].x;
-        if (min_y > points[i].y) min_y = points[i].y;
-        if (max_x < points[i].x) max_x = points[i].x;
-        if (max_y < points[i].y) max_y = points[i].y;
-      }
-
-      path += `L ${max_x} 0`;
-      path += `L ${min_x} 0`;
-
-      const c = document.createElementNS(
-        "http://www.w3.org/2000/svg",
-        "path"
-      );
-      
-      // console.log(path);
-      c.setAttribute("d", path);
-      c.setAttribute("fill", color);
-      // c.setAttribute("stroke", "red");
-      // c.setAttribute("stroke-width", "6");
-      return c;
-    }
-
     function getRandomInt(min, max) {
       min = Math.ceil(min);
       max = Math.floor(max);
       return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    function createSpline(
+    function createColorfulBlobs(
       containerId,
-      inputs
+      bgColor,
+      fgColor,
+      numPoints, variance
     ) {
       const container = document.getElementById(containerId);
       var cvb = container.viewBox.baseVal;
 
-      const fgColor = inputs['fgcolor'];
-      const bgColor = inputs['bgcolor'];
-      const variance = inputs['variance'];
-      const numPoints = inputs['num_points'];
-      const start = inputs['start'];
-      const end = inputs['end'];
-
       container.innerHTML = "";
 
-      // create background
       const bgrect = document.createElementNS(
         "http://www.w3.org/2000/svg",
         "rect"
@@ -164,7 +108,7 @@
       bgrect.setAttribute("fill", bgColor);
       container.appendChild(bgrect);
 
-      // generate points for spline
+
       var spacing = cvb.width / (numPoints - 1);
 
       var points = [];
@@ -173,48 +117,42 @@
       for (let j = 0; j < numPoints; j++) {
 
         var plusorminus = Math.random() < 0.5 ? -1 : 1;
-        // varied_height = cvb.height / 2 - variance * (cvb.height / 2) / 100 * Math.random() * plusorminus;
-
-        let increment =  (end-start) / (numPoints-1) /  100.0; 
-        // console.log(`increment is ${increment}`);
-        varied_height = cvb.height * (start / 100.0 + increment * j);
-        varied_height -= variance * (cvb.height / 2) / 100 * Math.random() * plusorminus;
+        varied_height = cvb.height / 2 - variance * (cvb.height / 2) / 100 * Math.random() * plusorminus;
 
         let xVal = spacing * j;
         let yVal = varied_height;
 
-        // console.log(xVal, yVal);
-        // container.appendChild(Dot(xVal, yVal, "blue"));
+        console.log(xVal, yVal);
+        container.appendChild(Dot(xVal, yVal, "blue"));
         points.push({ x: xVal, y: yVal });
         // container.appendChild(Dot(xVal, yVal, "red"));
       }
 
       // primitive lines
-      // for (let j = 0; j < (points.length - 1); j++) {
-      //   container.appendChild(Line(points[j].x, points[j].y, points[j + 1].x, points[j + 1].y, "grey"));
-      // }
+      for (let j = 0; j < (points.length - 1); j++) {
+        container.appendChild(Line(points[j].x, points[j].y, points[j + 1].x, points[j + 1].y, "grey"));
+      }
 
       // calculate spline beziers control points
-      var x = new Array();
-      var y = new Array();
+      x = new Array();
+      y = new Array();
       for (let j = 0; j < (points.length); j++) {
         x[j] = points[j].x;
         y[j] = points[j].y;
       }
-      var px = computeControlPoints(x);
-      var py = computeControlPoints(y);
+      px = computeControlPoints(x);
+      py = computeControlPoints(y);
 
-      // console.log(x);
-      // console.log(y);
-      // console.log(px);
-      // console.log(py);
+      console.log(x);
+      console.log(y);
+      console.log(px);
+      console.log(py);
 
-      container.appendChild(Curves(points, px, py, fgColor));
 
       // create beziers curve
-      // for (let i = 0; i < (points.length - 1); i++) {
-      //   container.appendChild(Curve(x[i], y[i], px.p1[i], py.p1[i], px.p2[i], py.p2[i], x[i + 1], y[i + 1]));
-      // }
+      for (let i = 0; i < (points.length - 1); i++) {
+        container.appendChild(Curve(x[i], y[i], px.p1[i], py.p1[i], px.p2[i], py.p2[i], x[i + 1], y[i + 1]));
+      }
 
     }
 
