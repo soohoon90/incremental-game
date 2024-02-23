@@ -7,16 +7,16 @@
   <title>Craft Tycoon</title>
   <link rel="preconnect" href="https://rsms.me/">
   <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
-  <link rel="stylesheet" href="boxes.css">
+  <link rel="stylesheet" href="save.css">
 </head>
 
 <body>
 
   <div id="appHeader">
     <h1>Craft Tycoon</h1>
+    <div id="scores"></div>
   </div>
   <div id="container">
-    <div id="scores"></div>
     <div id="materials">
       <h2>Materials</h2>
     </div>
@@ -29,38 +29,65 @@
   </div>
 
   <script>
-    var gamedata = {
-      level: 1,
-      exp: 0,
-      money: 20,
 
-      material: 5,
-      material_max: 10,
-      material_level: 1,
+const saveKey = "01-numbers-v3";
+    const saveInterval = 3000;
+    var lastSaved = 0;
+    var gamedata;
 
-      leather: 0,
-      leather_max: 0,
-      leather_level: 0,
+    function reset(){
+      gamedata = {
+        level: 1,
+        exp: 0,
+        money: 20,
 
-      rock: 0,
-      rock_max: 0,
-      rock_level: 0,
+        material: 5,
+        material_max: 10,
+        material_level: 1,
 
-      wood: 0,
-      wood_max: 0,
-      wood_level: 0,
+        leather: 0,
+        leather_max: 0,
+        leather_level: 0,
 
-      herb: 0,
-      herb_max: 0,
-      herb_level: 0,
+        rock: 0,
+        rock_max: 0,
+        rock_level: 0,
 
-      crafting: 0,
-      crafting_max: 2,
-      crafting_level: 1,
+        wood: 0,
+        wood_max: 0,
+        wood_level: 0,
 
-      upgrading: 0,
-      upgrading_max: 1
-    };
+        herb: 0,
+        herb_max: 0,
+        herb_level: 0,
+
+        crafting: 0,
+        crafting_max: 2,
+        crafting_level: 1,
+
+        upgrading: 0,
+        upgrading_max: 1
+      };
+    }
+
+    function loadGame() {
+        var savegame = JSON.parse(localStorage.getItem(saveKey));
+        if (savegame !== null) {
+            gamedata = savegame;
+        //Function to update all of screen
+        } else {
+            reset();
+        }
+    }
+
+    function saveIfNeeded() {
+        lastSaved += 1000;
+        if (lastSaved >= saveInterval) {
+            lastSaved = 0;
+            localStorage.setItem(saveKey, JSON.stringify(gamedata));
+            console.log("Game saved.");
+        }
+    }
 
     const material_list = [
       'material', 'leather', 'rock', 'wood', 'herb'
@@ -131,16 +158,14 @@
     function updateScores() {
       const scores = document.querySelector("#scores");
       scores.innerHTML = "";
-      scores.innerHTML += `<h2>Stats</h2>`;
-
       // crafting queue
       gamedata.crafting = document.querySelectorAll('svg').length
       document.querySelector("#queue_number").innerHTML = `${gamedata.crafting} / ${gamedata.crafting_max}`;
 
       // scores.innerHTML += `<div>Crafting ${gamedata.crafting} / ${gamedata.crafting_max}</div>`;
       scores.innerHTML += `<div>$ ${gamedata.money}</div>`;
-      scores.innerHTML += `<div>Level: ${gamedata.level}</div>`;
-      scores.innerHTML += `<div>Experience: ${gamedata.exp}</div>`;
+      // scores.innerHTML += `<div>Level: ${gamedata.level}</div>`;
+      // scores.innerHTML += `<div>Experience: ${gamedata.exp}</div>`;
 
       // for (let key in gamedata) {
       //   scores.innerHTML += `${key}: ${gamedata[key]}<br>`;
@@ -374,13 +399,12 @@
     createButtonForCraftItem({ name: "Trasure", cost: 50, seconds: 120, price: 2400, leather: 11, wood: 11, herb: 11, rock: 11 });
 
 
-
-
     material_list.forEach(function (ea) {
       createButtonForUpgrades({ type: ea });
       console.log("created " + ea + " button");
     });
 
+    loadGame();
     updateMaterialAndUpgrades();
     updateScores();
 
@@ -388,6 +412,7 @@
     setInterval(function () {
       updateMaterialAndUpgrades();
       updateScores();
+      saveIfNeeded();
     }, 1000);
 
 

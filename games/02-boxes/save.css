@@ -20,21 +20,6 @@ body{
   text-shadow: 0 2px 5px rgba(0,0,0,0.5);
 }
 
-
-
-#scores div{
-  display: block;
-  width: 100%;
-
-  padding: 10px;
-  border-radius: 10px;
-  margin-inline: 10px;
-
-  background-color: white;
-  border: 1px solid #efefef;
-  text-align: left;
-}
-
 #container {
   display: flex;
   gap: 10px;
@@ -51,9 +36,9 @@ body{
   margin: 5px;
 }
 
-#materials button, #upgrades button, #controls button {
-  display: block;
-  width: 100%;
+#scores div, #materials button, #upgrades button, #controls button {
+  display: inline-block;
+  /* width: 100%; */
 
   padding: 10px;
   border-radius: 10px;
@@ -61,6 +46,16 @@ body{
   background-color: white;
   border: 1px solid #efefef;
   text-align: left;
+  box-sizing: border-box;
+}
+
+#appHeader > #scores div{
+  display: inline-block;
+  width: auto;
+  background-color: transparent;
+
+  padding: 10px 20px;
+  border: 1px solid #efefef;
 }
 
 #materials button:hover:enabled ,#controls button:hover:enabled{
