@@ -17,25 +17,25 @@
       <input type="color" id="bgcolor" value="#BCCCD3" /><br />
 
       Primary Color: <br />
-      <input type="color" id="fgcolor" value="#2196F3" /><br />
+      <input type="color" id="fgcolor" value="#111122" /><br />
       <!-- 
       Secondary Color: <br />
       <input type="color" id="fgcolor2" value="#017663" /><br /> -->
 
       Steps: <br />
-      <input type="range" id="steps" value="7" min="2" max="35" /><br /> 
+      <input type="range" id="steps" value="20" min="5" max="50" /><br />  
 
       variance: <br />
-      <input type="range" id="variance" value="20" min="0" max="100" /><br />
+      <input type="range" id="variance" value="3" min="0" max="100" /><br />
 
       num_points: <br />
-      <input type="range" id="num_points" value="6" min="3" max="12" /><br />
+      <input type="range" id="num_points" value="3" min="3" max="12" /><br />
 
       starting point: <br />
-      <input type="range" id="start" value="25" min="0" max="100" /><br />
+      <input type="range" id="start" value="99" min="-50" max="150" /><br />
 
       end point: <br />
-      <input type="range" id="end" value="75" min="0" max="100" /><br />
+      <input type="range" id="end" value="99" min="-50" max="150" /><br />
 
       gaps: <br />
       <input type="range" id="gaps" value="75" min="50" max="200" /><br />
@@ -111,10 +111,7 @@
       return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    function generate(
-      containerId,
-      inputs
-    ) {
+    function generate(containerId,inputs) {
       const container = document.getElementById(containerId);
       var cvb = container.viewBox.baseVal;
 
@@ -174,6 +171,9 @@
         // console.log(`${j} - ${stepcolor}`);
         const c = Curves(points, px, py, stepcolor);
         c.setAttribute("transform", `translate(0 ${-1 * j * gaps})`);
+        c.setAttribute("stroke", `rgba(255,255,255,0.2)`);
+        c.setAttribute("stroke-width", `1`);
+
         container.appendChild(c);
       }
 
