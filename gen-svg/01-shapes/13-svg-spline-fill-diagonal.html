@@ -96,6 +96,7 @@
       return c;
     }
 
+    // create a path that includes the points and goes up
     function Curves(points, cx, cy, color){
       
       var path = `M ${points[0].x} ${points[0].y}`;
@@ -174,11 +175,14 @@
 
         var plusorminus = Math.random() < 0.5 ? -1 : 1;
         // varied_height = cvb.height / 2 - variance * (cvb.height / 2) / 100 * Math.random() * plusorminus;
+        var increment = increment =  (end-start) / (numPoints-1) /  100.0; 
 
-        let increment =  (end-start) / (numPoints-1) /  100.0; 
         // console.log(`increment is ${increment}`);
         varied_height = cvb.height * (start / 100.0 + increment * j);
-        varied_height -= variance * (cvb.height / 2) / 100 * Math.random() * plusorminus;
+
+        if (j > 0 && j < numPoints-1){
+          varied_height -= variance * (cvb.height / 2) / 100 * Math.random() * plusorminus;
+        }
 
         let xVal = spacing * j;
         let yVal = varied_height;
@@ -186,7 +190,7 @@
         // console.log(xVal, yVal);
         // container.appendChild(Dot(xVal, yVal, "blue"));
         points.push({ x: xVal, y: yVal });
-        // container.appendChild(Dot(xVal, yVal, "red"));
+        container.appendChild(Dot(xVal, yVal, "red"));
       }
 
       // primitive lines

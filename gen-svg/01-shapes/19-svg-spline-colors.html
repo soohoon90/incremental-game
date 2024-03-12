@@ -4,46 +4,41 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Multiple Blobs with Steps</title>
-  <link rel="stylesheet" href="wallpaper-generater.css">
+  <title>Single Spline Diagonal</title>
+  <link rel="stylesheet" href="../svg-generators.css">
 </head>
 
 <body>
-  <div id="app-container">
-    <svg id="svg-container" viewBox="0 0 2560 2560" width="100%" height="100%"></svg>
+  <svg id="svg-container" viewBox="0 0 1600 900"></svg>
 
-    <div id="controls">
-      Background Color: <br />
-      <input type="color" id="bgcolor" value="#BCCCD3" /><br />
+  <div id="controls">
+    Background Color: <br />
+    <input type="color" id="bgcolor" value="#BCCCD3" /><br />
 
-      Primary Color: <br />
-      <input type="color" id="fgcolor" value="#111122" /><br />
-      <!-- 
-      Secondary Color: <br />
-      <input type="color" id="fgcolor2" value="#017663" /><br /> -->
+    Primary Color: <br />
+    <input type="color" id="fgcolor" value="#2196F3" /><br />
+<!-- 
+    Secondary Color: <br />
+    <input type="color" id="fgcolor2" value="#017663" /><br /> -->
 
-      Steps: <br />
-      <input type="range" id="steps" value="20" min="5" max="50" /><br />  
+    Steps: <br />
+    <input type="range" id="steps" value="7" min="2" max="15" /><br />
 
-      variance: <br />
-      <input type="range" id="variance" value="3" min="0" max="100" /><br />
+    variance: <br />
+    <input type="range" id="variance" value="20" min="0" max="100" /><br />
 
-      num_points: <br />
-      <input type="range" id="num_points" value="3" min="3" max="12" /><br />
+    num_points: <br />
+    <input type="range" id="num_points" value="6" min="3" max="12" /><br />
 
-      starting point: <br />
-      <input type="range" id="start" value="99" min="-50" max="150" /><br />
+    starting point: <br />
+    <input type="range" id="start" value="25" min="0" max="100" /><br />
 
-      end point: <br />
-      <input type="range" id="end" value="99" min="-50" max="150" /><br />
+    end point: <br />
+    <input type="range" id="end" value="75" min="0" max="100" /><br />
 
-      gaps: <br />
-      <input type="range" id="gaps" value="75" min="50" max="200" /><br />
-
-      <button id="download">download</button>
-    </div>
+    gaps: <br />
+    <input type="range" id="gaps" value="75" min="50" max="200" /><br />
   </div>
-
 
   <script>
     const inputs = document.getElementsByTagName("input");
@@ -66,13 +61,30 @@
       generate("svg-container", input_array);
     }
 
-
-    function getRandomInt(min, max) {
-      min = Math.ceil(min);
-      max = Math.floor(max);
-      return Math.floor(Math.random() * (max - min + 1)) + min;
+    function Dot(x, y, color) {
+      const dot = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "circle"
+      );
+      dot.setAttribute("cx", x);
+      dot.setAttribute("cy", y);
+      dot.setAttribute("r", 10);
+      dot.setAttribute("fill", color);
+      return dot;
     }
 
+    function Line(x1, y1, x2, y2, color) {
+      const l = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "line"
+      );
+      l.setAttribute("x1", x1);
+      l.setAttribute("y1", y1);
+      l.setAttribute("x2", x2);
+      l.setAttribute("y2", y2);
+      l.setAttribute("stroke", color);
+      return l;
+    }
 
     // create a path that includes the curves and a box that up
     function Curves(points, cx, cy, color) {
@@ -111,7 +123,10 @@
       return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
-    function generate(containerId,inputs) {
+    function generate(
+      containerId,
+      inputs
+    ) {
       const container = document.getElementById(containerId);
       var cvb = container.viewBox.baseVal;
 
@@ -141,8 +156,10 @@
       // create a list of points at varied heights across
       for (let j = 0; j < numPoints; j++) {
         var plusorminus = Math.random() < 0.5 ? -1 : 1;
+        // varied_height = cvb.height / 2 - variance * (cvb.height / 2) / 100 * Math.random() * plusorminus;
         var increment = increment = (end - start) / (numPoints - 1) / 100.0;
 
+        // console.log(`increment is ${increment}`);
         varied_height = cvb.height * (start / 100.0 + increment * j);
 
         // fix the beginning and the end
@@ -153,7 +170,10 @@
         let xVal = spacing * j;
         let yVal = varied_height;
 
+        // console.log(xVal, yVal);
+        // container.appendChild(Dot(xVal, yVal, "blue"));
         points.push({ x: xVal, y: yVal });
+        // container.appendChild(Dot(xVal, yVal, "red"));
       }
 
       // calculate spline beziers control points
@@ -171,9 +191,6 @@
         // console.log(`${j} - ${stepcolor}`);
         const c = Curves(points, px, py, stepcolor);
         c.setAttribute("transform", `translate(0 ${-1 * j * gaps})`);
-        c.setAttribute("stroke", `rgba(255,255,255,0.2)`);
-        c.setAttribute("stroke-width", `1`);
-
         container.appendChild(c);
       }
 
@@ -283,61 +300,12 @@
         l: (hsl2.l - hsl1.l) / steps
       }
       const hsl3 = {
-        h: hsl1.h + delta.h * (i + 1),
-        s: hsl1.s + delta.s * (i + 1),
-        l: hsl1.l + delta.l * (i + 1)
+        h: hsl1.h + delta.h * i,
+        s: hsl1.s + delta.s * i,
+        l: hsl1.l + delta.l * i
       }
       return hsltoString(hsl3);
     }
-
-    // https://stackoverflow.com/questions/28226677/save-inline-svg-as-jpeg-png-svg
-    function triggerDownload(imgURI) {
-      const a = document.createElement('a');
-      a.download = 'MY_COOL_IMAGE.png'; // filename
-      a.target = '_blank';
-      a.href = imgURI;
-
-      // trigger download button
-      // (set `bubbles` to false here.
-      // or just `a.click()` if you don't care about bubbling)
-      a.dispatchEvent(new MouseEvent('click', {
-        view: window,
-        bubbles: false,
-        cancelable: true
-      }));
-    }
-
-    document.querySelector('#download').addEventListener('click', function () {
-      const svgNode = document.querySelector('#svg-container');
-      const svgString = (new XMLSerializer()).serializeToString(svgNode);
-      const svgBlob = new Blob([svgString], {
-        type: 'image/svg+xml;charset=utf-8'
-      });
-
-      console.log(svgNode);
-
-      const DOMURL = window.URL || window.webkitURL || window;
-      const url = DOMURL.createObjectURL(svgBlob);
-
-      const image = new Image();
-      image.width = svgNode.viewBox.baseVal.width;
-      image.height = svgNode.viewBox.baseVal.height;
-      image.src = url;
-      image.onload = function () {
-        const canvas = document.createElement('canvas');;
-        canvas.width = image.width;
-        canvas.height = image.height;
-
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(image, 0, 0);
-        DOMURL.revokeObjectURL(url);
-
-        const imgURI = canvas
-          .toDataURL('image/png')
-          .replace('image/png', 'image/octet-stream');
-        triggerDownload(imgURI);
-      };
-    });
 
     // initial render
     generateUsingInput();
