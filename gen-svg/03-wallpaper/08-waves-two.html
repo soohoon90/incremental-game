@@ -10,40 +10,65 @@
 
 <body>
   <div id="app-container">
-    <svg id="svg-container" viewBox="0 0 2560 1600" width="100%" height="100%"></svg>
-
+    <svg id="svg-container" viewBox="0 0 2560 1440" width="100%" height="100%"></svg>
+<!-- bgcolor
+: 
+"#d6d6d6"
+end
+: 
+"107"
+fgcolor
+: 
+"#2eb28b"
+fgcolor2
+: 
+"#fb6413"
+gaps
+: 
+"193"
+num_points
+: 
+"3"
+start
+: 
+"118"
+steps
+: 
+"5"
+variance
+: 
+"19" -->
     <div id="controls">
-      Background Color: <br />
-      <input type="color" id="bgcolor" value="#BCCCD3" /><br />
+      Background (Middle) Color: <br />
+      <input type="color" id="bgcolor" value="#d6d6d6" /><br />
 
       Primary Color: <br />
-      <input type="color" id="fgcolor" value="#111122" /><br />
-      <!-- 
+      <input type="color" id="fgcolor" value="#2eb28b" /><br />
+      
       Secondary Color: <br />
-      <input type="color" id="fgcolor2" value="#017663" /><br /> -->
+      <input type="color" id="fgcolor2" value="#fb6413" /><br />
 
-      Steps: <br />
-      <input type="range" id="steps" value="20" min="5" max="50" /><br />  
+      Steps (each way): <br />
+      <input type="range" id="steps" value="5" min="3" max="25" /><br />  
 
-      variance: <br />
+      variance / amplitude: <br />
       <input type="range" id="variance" value="3" min="0" max="100" /><br />
 
       num_points: <br />
       <input type="range" id="num_points" value="3" min="3" max="12" /><br />
 
       starting point: <br />
-      <input type="range" id="start" value="99" min="-50" max="150" /><br />
+      <input type="range" id="start" value="118" min="-50" max="150" /><br />
 
       end point: <br />
-      <input type="range" id="end" value="99" min="-50" max="150" /><br />
+      <input type="range" id="end" value="107" min="-50" max="150" /><br />
 
       gaps: <br />
-      <input type="range" id="gaps" value="75" min="50" max="200" /><br />
+      <input type="range" id="gaps" value="190" min="50" max="200" /><br />
 
       <button id="download">download</button>
     </div>
   </div>
-
 
   <script>
     const inputs = document.getElementsByTagName("input");
@@ -72,7 +97,6 @@
       max = Math.floor(max);
       return Math.floor(Math.random() * (max - min + 1)) + min;
     }
-
 
     // create a path that includes the curves and a box that up
     function Curves(points, cx, cy, color) {
@@ -166,8 +190,13 @@
       var px = computeControlPoints(x);
       var py = computeControlPoints(y);
 
-      for (let j = 0; j < steps; j++) {
-        const stepcolor = hslsteps(bgColor, fgColor, j, steps);
+      for (let j = 0; j < (steps*2); j++) {
+        
+        var stepcolor = hslsteps(fgColor, bgColor, j, steps);
+        if (j >= steps){
+          stepcolor = hslsteps(bgColor, fgColor2, j-steps, steps);
+        } 
+
         // console.log(`${j} - ${stepcolor}`);
         const c = Curves(points, px, py, stepcolor);
         c.setAttribute("transform", `translate(0 ${-1 * j * gaps})`);
@@ -277,16 +306,39 @@
     function hslsteps(hex, hex2, i, steps) {
       const hsl1 = hexToHSL(hex);
       const hsl2 = hexToHSL(hex2);
+
+      // if one of the hsl is GREY then fix the H to the other
+      if (hsl1.s == 0){
+        hsl1.h = hsl2.h;
+      }
+
+      if (hsl2.s == 0){
+        hsl2.h = hsl1.h;
+      }
+
+      // if one of the h is closer by going around (360->0)
+      // e.g. h1 = 20, h2 = 300 (delta = 280, alt = 80)
+      if (360 - Math.abs(hsl2.h - hsl1.h) < Math.abs(hsl2.h - hsl1.h)){
+        console.log(`wrap around ${360 - Math.abs(hsl2.h - hsl1.h)} < ${Math.abs(hsl2.h - hsl1.h)}`);
+        if (hsl1.h < 180) hsl1.h += 360;
+        if (hsl2.h < 180) hsl2.h += 360;
+        console.log(`changed ${hsl1.h}  ${hsl2.h}`);
+
+      }
+
       const delta = {
         h: (hsl2.h - hsl1.h) / steps,
         s: (hsl2.s - hsl1.s) / steps,
         l: (hsl2.l - hsl1.l) / steps
       }
+
       const hsl3 = {
         h: hsl1.h + delta.h * (i + 1),
         s: hsl1.s + delta.s * (i + 1),
         l: hsl1.l + delta.l * (i + 1)
       }
+
+      console.log(hsl3);
       return hsltoString(hsl3);
     }
 
