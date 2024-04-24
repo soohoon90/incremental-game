@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multiple Gradient Bars</title>
+  <link rel="stylesheet" href="wallpaper-generater.css">
+</head>
+
+<body>
+  <div id="app-container">
+    <svg id="svg-container" viewBox="0 0 2560 1440" width="100%" height="100%"></svg>
+
+    <div id="controls">
+      Color 1: <br />
+      <input type="color" id="color1" value="#d6d6d6" /><br />
+
+      Color 2: <br />
+      <input type="color" id="color2" value="#2eb28b" /><br />
+      
+      Color 3: <br />
+      <input type="color" id="color3" value="#fb6413" /><br />
+
+      Steps: <br />
+      <input type="range" id="steps" value="5" min="3" max="25" /><br />  
+
+      variance / amplitude: <br />
+      <input type="range" id="variance" value="3" min="0" max="100" /><br />
+
+      starting point: <br />
+      <input type="range" id="start" value="118" min="-50" max="150" /><br />
+
+      end point: <br />
+      <input type="range" id="end" value="107" min="-50" max="150" /><br />
+
+      <button id="download">download</button>
+    </div>
+  </div>
+
+  <script>
+    const inputs = document.getElementsByTagName("input");
+    for (const el of Array.from(inputs)) {
+      el.addEventListener("input", generateUsingInput);
+    }
+
+    function generateUsingInput() {
+      const inputs = document.getElementsByTagName("input");
+      var input_array = new Array();
+      for (const el of Array.from(inputs)) {
+        // console.log(`${el.id} has value ${el.value}`);
+        input_array[el.id] = el.value;
+      }
+      // console.log(input_array);
+
+      console.log("generating...");
+      console.log(input_array);
+
+      generate("svg-container", input_array);
+    }
+
+
+    function getRandomInt(min, max) {
+      min = Math.ceil(min);
+      max = Math.floor(max);
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    // create a path that includes the curves and a box that up
+    function Curves(points, cx, cy, color) {
+      var path = `M ${points[0].x} ${points[0].y}`
+
+      var min_x = points[0].x;
+      var min_y = points[0].y;
+      var max_x = points[0].x;
+      var max_y = points[0].y;
+
+      for (i = 1; i < points.length; i++) {
+        path += `C ${cx.p1[i - 1]} ${cy.p1[i - 1]} ${cx.p2[i - 1]} ${cy.p2[i - 1]} ${points[i].x} ${points[i].y}`;
+
+        if (min_x > points[i].x) min_x = points[i].x;
+        if (min_y > points[i].y) min_y = points[i].y;
+        if (max_x < points[i].x) max_x = points[i].x;
+        if (max_y < points[i].y) max_y = points[i].y;
+      }
+
+      path += `L ${max_x} 0`;
+      path += `L ${min_x} 0`;
+
+      const c = document.createElementNS("http://www.w3.org/2000/svg", "path");
+
+      // console.log(path);
+      c.setAttribute("d", path);
+      c.setAttribute("fill", color);
+      // c.setAttribute("stroke", "red");
+      // c.setAttribute("stroke-width", "6");
+      return c;
+    }
+
+    function getRandomInt(min, max) {
+      min = Math.ceil(min);
+      max = Math.floor(max);
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function generate(containerId,inputs) {
+      const container = document.getElementById(containerId);
+      var cvb = container.viewBox.baseVal;
+
+      const fgColor = inputs['fgcolor'];
+      const fgColor2 = inputs['fgcolor2'];
+      const bgColor = inputs['bgcolor'];
+      const steps = inputs['steps'];
+      const variance = inputs['variance'];
+      const numPoints = inputs['num_points'];
+      const start = inputs['start'];
+      const end = inputs['end'];
+      const gaps = inputs['gaps'];
+
+      container.innerHTML = "";
+
+      // create background
+      const bgrect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+      bgrect.setAttribute("width", cvb.width);
+      bgrect.setAttribute("height", cvb.height);
+      bgrect.setAttribute("fill", bgColor);
+      container.appendChild(bgrect);
+
+      // generate points for spline
+      var spacing = cvb.width / (numPoints - 1);
+      var points = [];
+
+      // create a list of points at varied heights across
+      for (let j = 0; j < numPoints; j++) {
+        var plusorminus = Math.random() < 0.5 ? -1 : 1;
+        var increment = increment = (end - start) / (numPoints - 1) / 100.0;
+
+        varied_height = cvb.height * (start / 100.0 + increment * j);
+
+        // fix the beginning and the end
+        if (j > 0 && j < numPoints - 1) {
+          varied_height -= variance * (cvb.height / 2) / 100 * Math.random() * plusorminus;
+        }
+
+        let xVal = spacing * j;
+        let yVal = varied_height;
+
+        points.push({ x: xVal, y: yVal });
+      }
+
+      // calculate spline beziers control points
+      var x = new Array();
+      var y = new Array();
+      for (let j = 0; j < (points.length); j++) {
+        x[j] = points[j].x;
+        y[j] = points[j].y;
+      }
+      var px = computeControlPoints(x);
+      var py = computeControlPoints(y);
+
+      for (let j = 0; j < (steps*2); j++) {
+        
+        var stepcolor = hslsteps(fgColor, bgColor, j, steps);
+        if (j >= steps){
+          stepcolor = hslsteps(bgColor, fgColor2, j-steps, steps);
+        } 
+
+        // console.log(`${j} - ${stepcolor}`);
+        const c = Curves(points, px, py, stepcolor);
+        c.setAttribute("transform", `translate(0 ${-1 * j * gaps})`);
+        c.setAttribute("stroke", `rgba(255,255,255,0.2)`);
+        c.setAttribute("stroke-width", `1`);
+
+        container.appendChild(c);
+      }
+
+    }
+
+    /*computes control points given knots K, this is the brain of the operation*/
+    function computeControlPoints(points) {
+      p1 = new Array();
+      p2 = new Array();
+      n = points.length - 1;
+
+      /*rhs vector*/
+      a = new Array();
+      b = new Array();
+      c = new Array();
+      r = new Array();
+
+      /*left most segment*/
+      a[0] = 0;
+      b[0] = 2;
+      c[0] = 1;
+      r[0] = points[0] + 2 * points[1];
+
+      /*internal segments*/
+      for (i = 1; i < n - 1; i++) {
+        a[i] = 1;
+        b[i] = 4;
+        c[i] = 1;
+        r[i] = 4 * points[i] + 2 * points[i + 1];
+      }
+
+      /*right segment*/
+      a[n - 1] = 2;
+      b[n - 1] = 7;
+      c[n - 1] = 0;
+      r[n - 1] = 8 * points[n - 1] + points[n];
+
+      /*solves Ax=b with the Thomas algorithm (from Wikipedia)*/
+      for (i = 1; i < n; i++) {
+        m = a[i] / b[i - 1];
+        b[i] = b[i] - m * c[i - 1];
+        r[i] = r[i] - m * r[i - 1];
+      }
+
+      p1[n - 1] = r[n - 1] / b[n - 1];
+      for (i = n - 2; i >= 0; --i)
+        p1[i] = (r[i] - c[i] * p1[i + 1]) / b[i];
+
+      /*we have p1, now compute p2*/
+      for (i = 0; i < n - 1; i++)
+        p2[i] = 2 * points[i + 1] - p1[i + 1];
+
+      p2[n - 1] = 0.5 * (points[n] + p1[n - 1]);
+
+      return { p1: p1, p2: p2 };
+    }
+
+    function hexToHSL(hex) {
+      let r = parseInt(hex.substring(1, 3), 16) / 255;
+      let g = parseInt(hex.substring(3, 5), 16) / 255;
+      let b = parseInt(hex.substring(5, 7), 16) / 255;
+
+      let cmin = Math.min(r, g, b);
+      let cmax = Math.max(r, g, b);
+      let delta = cmax - cmin;
+
+      let h = 0;
+      let s = 0;
+      let l = 0;
+
+      if (delta == 0) {
+        h = 0;
+      } else if (cmax == r) {
+        h = ((g - b) / delta) % 6;
+      } else if (cmax == g) {
+        h = (b - r) / delta + 2;
+      } else {
+        h = (r - g) / delta + 4;
+      }
+
+      h = Math.round(h * 60);
+
+      if (h < 0) {
+        h += 360;
+      }
+
+      l = (cmax + cmin) / 2;
+
+      s = delta == 0 ? 0 : delta / (1 - Math.abs(2 * l - 1));
+
+      s = +(s * 100).toFixed(1);
+      l = +(l * 100).toFixed(1);
+
+      return { h: h, s: s, l: l };
+    }
+
+    function hsltoString(hsl) {
+      return `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
+    }
+
+    function hslsteps(hex, hex2, i, steps) {
+      const hsl1 = hexToHSL(hex);
+      const hsl2 = hexToHSL(hex2);
+
+      // if one of the hsl is GREY then fix the H to the other
+      if (hsl1.s == 0){
+        hsl1.h = hsl2.h;
+      }
+
+      if (hsl2.s == 0){
+        hsl2.h = hsl1.h;
+      }
+
+      // if one of the h is closer by going around (360->0)
+      // e.g. h1 = 20, h2 = 300 (delta = 280, alt = 80)
+      if (360 - Math.abs(hsl2.h - hsl1.h) < Math.abs(hsl2.h - hsl1.h)){
+        console.log(`wrap around ${360 - Math.abs(hsl2.h - hsl1.h)} < ${Math.abs(hsl2.h - hsl1.h)}`);
+        if (hsl1.h < 180) hsl1.h += 360;
+        if (hsl2.h < 180) hsl2.h += 360;
+        console.log(`changed ${hsl1.h}  ${hsl2.h}`);
+
+      }
+
+      const delta = {
+        h: (hsl2.h - hsl1.h) / steps,
+        s: (hsl2.s - hsl1.s) / steps,
+        l: (hsl2.l - hsl1.l) / steps
+      }
+
+      const hsl3 = {
+        h: hsl1.h + delta.h * (i + 1),
+        s: hsl1.s + delta.s * (i + 1),
+        l: hsl1.l + delta.l * (i + 1)
+      }
+
+      console.log(hsl3);
+      return hsltoString(hsl3);
+    }
+
+    // https://stackoverflow.com/questions/28226677/save-inline-svg-as-jpeg-png-svg
+    function triggerDownload(imgURI) {
+      const a = document.createElement('a');
+      a.download = 'MY_COOL_IMAGE.png'; // filename
+      a.target = '_blank';
+      a.href = imgURI;
+
+      // trigger download button
+      // (set `bubbles` to false here.
+      // or just `a.click()` if you don't care about bubbling)
+      a.dispatchEvent(new MouseEvent('click', {
+        view: window,
+        bubbles: false,
+        cancelable: true
+      }));
+    }
+
+    document.querySelector('#download').addEventListener('click', function () {
+      const svgNode = document.querySelector('#svg-container');
+      const svgString = (new XMLSerializer()).serializeToString(svgNode);
+      const svgBlob = new Blob([svgString], {
+        type: 'image/svg+xml;charset=utf-8'
+      });
+
+      console.log(svgNode);
+
+      const DOMURL = window.URL || window.webkitURL || window;
+      const url = DOMURL.createObjectURL(svgBlob);
+
+      const image = new Image();
+      image.width = svgNode.viewBox.baseVal.width;
+      image.height = svgNode.viewBox.baseVal.height;
+      image.src = url;
+      image.onload = function () {
+        const canvas = document.createElement('canvas');;
+        canvas.width = image.width;
+        canvas.height = image.height;
+
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(image, 0, 0);
+        DOMURL.revokeObjectURL(url);
+
+        const imgURI = canvas
+          .toDataURL('image/png')
+          .replace('image/png', 'image/octet-stream');
+        triggerDownload(imgURI);
+      };
+    });
+
+    // initial render
+    generateUsingInput();
+  </script>
+</body>
+
+</html>
