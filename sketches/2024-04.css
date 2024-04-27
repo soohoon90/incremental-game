@@ -1,0 +1,38 @@
+body {
+  background-color: rgb(240, 240, 240);
+  font-family: sans-serif;
+  overflow: hidden;
+  margin:0;
+}
+
+svg {
+  border: 1px solid rgba(0, 0, 255, 0.2);
+  border-radius: 20px;
+  display: block;
+  width: 100%;
+  object-fit:cover;
+}
+
+svg text {
+  font-size: 30px;
+  font-weight: bold
+}
+
+#controls {
+  box-sizing: border-box;
+  padding: 20px;
+  border-radius: 20px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  background-color: white;
+}
+
+#app-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-around;
+  gap: 20px;
+  box-sizing: border-box;
+  height: 100vh; 
+  padding: 20px;
+} 
