@@ -4,44 +4,74 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Multiple Gradient Bars</title>
-  <link rel="stylesheet" href="wallpaper-generater.css">
+  <title>Hoon's Wallpaper Generators - Gradient Bars</title>
+  <link rel="stylesheet" href="wallpaper-generator2.css">
 </head>
 
 <body>
   <div id="app-container">
-    <svg id="svg-container" viewBox="0 0 2560 1440" width="100%" height="100%"></svg>
+    <div class="row-container">
+      <div id="logo">
+        Hoon's Wallpaper Generators - Gradient Bars
+      </div>
+      <div id="header-controls">
+        <button id="downloadsvg">Download SVG</button>
+        <button id="download">Download PNG</button>
+      </div>
+    </div>
 
-    <div id="controls">
-      Color 1: <br />
-      <input type="color" id="color1" value="#d6d6d6" /><br />
+    <div id="main" class="row-container">
+      <svg id="svg-container" viewBox="0 0 2560 1440"></svg>
+      <div id="controls">
+        Color 1: <br />
+        <input type="color" id="color1" value="#d6d6d6" /><br />
 
-      Color 2: <br />
-      <input type="color" id="color2" value="#2eb28b" /><br />
-      
-      Color 3: <br />
-      <input type="color" id="color3" value="#fb6413" /><br />
+        Color 2: <br />
+        <input type="color" id="color2" value="#2eb28b" /><br />
 
-      Steps: <br />
-      <input type="range" id="steps" value="5" min="3" max="25" /><br />  
+        Color 3: <br />
+        <input type="color" id="color3" value="#fb6413" /><br />
 
-      variance / amplitude: <br />
-      <input type="range" id="variance" value="3" min="0" max="100" /><br />
+        Steps: <br />
+        <input type="range" id="steps" value="5" min="3" max="25" /><br />
 
-      starting point: <br />
-      <input type="range" id="start" value="118" min="-50" max="150" /><br />
+        variance / amplitude: <br />
+        <input type="range" id="variance" value="3" min="0" max="100" /><br />
 
-      end point: <br />
-      <input type="range" id="end" value="107" min="-50" max="150" /><br />
+        starting point: <br />
+        <input type="range" id="start" value="118" min="-50" max="150" /><br />
 
-      <button id="download">download</button>
+        end point: <br />
+        <input type="range" id="end" value="107" min="-50" max="150" /><br />
+      </div>
     </div>
   </div>
 
   <script>
-    const inputs = document.getElementsByTagName("input");
-    for (const el of Array.from(inputs)) {
-      el.addEventListener("input", generateUsingInput);
+    function init() {
+      const inputs = Array.from(document.getElementsByTagName("input"));
+      inputs.forEach(function (input) {
+        // create display for each input
+        var displaySpan = document.createElement('span');
+        displaySpan.id = input.id + 'Display';
+        input.parentNode.insertBefore(displaySpan, input.nextSibling);
+
+        input.addEventListener('input', function () {
+          updateDisplay(input.id);
+          generateUsingInput();
+        });
+        updateDisplay(input.id);
+      });
+      generateUsingInput();
+    }
+
+    window.onload = init;
+
+    // Function to update the display next to the input
+    function updateDisplay(inputId) {
+      var input = document.getElementById(inputId);
+      var display = document.getElementById(inputId + 'Display');
+      display.textContent = input.value;
     }
 
     function generateUsingInput() {
@@ -59,6 +89,31 @@
       generate("svg-container", input_array);
     }
 
+    function generate(containerId, inputs) {
+      const container = document.getElementById(containerId);
+      var cvb = container.viewBox.baseVal;
+
+      const fgColor = inputs['color1'];
+      const fgColor2 = inputs['color2'];
+      const bgColor = inputs['color3'];
+      const steps = inputs['steps'];
+      const variance = inputs['variance'];
+      const start = inputs['start'];
+      const end = inputs['end'];
+
+      container.innerHTML = "";
+
+      // create background
+      const bgrect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+      bgrect.setAttribute("width", cvb.width);
+      bgrect.setAttribute("height", cvb.height);
+      bgrect.setAttribute("fill", bgColor);
+      container.appendChild(bgrect);
+
+
+
+      // container.appendChild(c);
+    }
 
     function getRandomInt(min, max) {
       min = Math.ceil(min);
@@ -95,85 +150,6 @@
       // c.setAttribute("stroke", "red");
       // c.setAttribute("stroke-width", "6");
       return c;
-    }
-
-    function getRandomInt(min, max) {
-      min = Math.ceil(min);
-      max = Math.floor(max);
-      return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
-
-    function generate(containerId,inputs) {
-      const container = document.getElementById(containerId);
-      var cvb = container.viewBox.baseVal;
-
-      const fgColor = inputs['fgcolor'];
-      const fgColor2 = inputs['fgcolor2'];
-      const bgColor = inputs['bgcolor'];
-      const steps = inputs['steps'];
-      const variance = inputs['variance'];
-      const numPoints = inputs['num_points'];
-      const start = inputs['start'];
-      const end = inputs['end'];
-      const gaps = inputs['gaps'];
-
-      container.innerHTML = "";
-
-      // create background
-      const bgrect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-      bgrect.setAttribute("width", cvb.width);
-      bgrect.setAttribute("height", cvb.height);
-      bgrect.setAttribute("fill", bgColor);
-      container.appendChild(bgrect);
-
-      // generate points for spline
-      var spacing = cvb.width / (numPoints - 1);
-      var points = [];
-
-      // create a list of points at varied heights across
-      for (let j = 0; j < numPoints; j++) {
-        var plusorminus = Math.random() < 0.5 ? -1 : 1;
-        var increment = increment = (end - start) / (numPoints - 1) / 100.0;
-
-        varied_height = cvb.height * (start / 100.0 + increment * j);
-
-        // fix the beginning and the end
-        if (j > 0 && j < numPoints - 1) {
-          varied_height -= variance * (cvb.height / 2) / 100 * Math.random() * plusorminus;
-        }
-
-        let xVal = spacing * j;
-        let yVal = varied_height;
-
-        points.push({ x: xVal, y: yVal });
-      }
-
-      // calculate spline beziers control points
-      var x = new Array();
-      var y = new Array();
-      for (let j = 0; j < (points.length); j++) {
-        x[j] = points[j].x;
-        y[j] = points[j].y;
-      }
-      var px = computeControlPoints(x);
-      var py = computeControlPoints(y);
-
-      for (let j = 0; j < (steps*2); j++) {
-        
-        var stepcolor = hslsteps(fgColor, bgColor, j, steps);
-        if (j >= steps){
-          stepcolor = hslsteps(bgColor, fgColor2, j-steps, steps);
-        } 
-
-        // console.log(`${j} - ${stepcolor}`);
-        const c = Curves(points, px, py, stepcolor);
-        c.setAttribute("transform", `translate(0 ${-1 * j * gaps})`);
-        c.setAttribute("stroke", `rgba(255,255,255,0.2)`);
-        c.setAttribute("stroke-width", `1`);
-
-        container.appendChild(c);
-      }
-
     }
 
     /*computes control points given knots K, this is the brain of the operation*/
@@ -276,17 +252,17 @@
       const hsl2 = hexToHSL(hex2);
 
       // if one of the hsl is GREY then fix the H to the other
-      if (hsl1.s == 0){
+      if (hsl1.s == 0) {
         hsl1.h = hsl2.h;
       }
 
-      if (hsl2.s == 0){
+      if (hsl2.s == 0) {
         hsl2.h = hsl1.h;
       }
 
       // if one of the h is closer by going around (360->0)
       // e.g. h1 = 20, h2 = 300 (delta = 280, alt = 80)
-      if (360 - Math.abs(hsl2.h - hsl1.h) < Math.abs(hsl2.h - hsl1.h)){
+      if (360 - Math.abs(hsl2.h - hsl1.h) < Math.abs(hsl2.h - hsl1.h)) {
         console.log(`wrap around ${360 - Math.abs(hsl2.h - hsl1.h)} < ${Math.abs(hsl2.h - hsl1.h)}`);
         if (hsl1.h < 180) hsl1.h += 360;
         if (hsl2.h < 180) hsl2.h += 360;
@@ -314,6 +290,22 @@
     function triggerDownload(imgURI) {
       const a = document.createElement('a');
       a.download = 'MY_COOL_IMAGE.png'; // filename
+      a.target = '_blank';
+      a.href = imgURI;
+
+      // trigger download button
+      // (set `bubbles` to false here.
+      // or just `a.click()` if you don't care about bubbling)
+      a.dispatchEvent(new MouseEvent('click', {
+        view: window,
+        bubbles: false,
+        cancelable: true
+      }));
+    }
+
+    function triggerDownloadsvg(imgURI) {
+      const a = document.createElement('a');
+      a.download = 'MY_COOL_IMAGE.svg'; // filename
       a.target = '_blank';
       a.href = imgURI;
 
@@ -359,8 +351,19 @@
       };
     });
 
-    // initial render
-    generateUsingInput();
+    document.querySelector('#downloadsvg').addEventListener('click', function () {
+      const svgNode = document.querySelector('#svg-container');
+      const svgString = (new XMLSerializer()).serializeToString(svgNode);
+      const svgBlob = new Blob([svgString], {
+        type: 'image/svg+xml;charset=utf-8'
+      });
+
+      const DOMURL = window.URL || window.webkitURL || window;
+      const url = DOMURL.createObjectURL(svgBlob);
+
+      triggerDownloadsvg(url);
+    });
+
   </script>
 </body>
 

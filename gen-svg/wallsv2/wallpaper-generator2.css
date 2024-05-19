@@ -1,0 +1,85 @@
+body {
+  background-color: rgb(228, 228, 228);
+  font-family: sans-serif;
+  overflow: hidden;
+  margin:0;
+}
+
+svg {
+  border: 1px solid rgba(0, 0, 255, 0.2);
+  border-radius: 8px;
+  display: block;
+  width: 100%;
+  object-fit:cover;
+}
+
+svg text {
+  font-size: 30px;
+  font-weight: bold
+}
+
+.row-container{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  gap: 8px;
+  box-sizing: border-box;
+  /* background-color: #ddd; */
+}
+
+#controls {
+  box-sizing: border-box;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  background-color: white;
+  overflow: hidden;
+  overflow-y: scroll;
+  scrollbar-color: #999 transparent;
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  width: 270px;
+  font-size: 14px;
+}
+
+#controls span{
+  /* padding: 4px 8px; */
+  margin: 4px;
+  padding: 4px;
+  border-radius: 4px;
+  background-color: #ddd;
+  /* border: 1px solid blue; */
+}
+
+#app-container {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  gap: 8px;
+  box-sizing: border-box;
+  height: 100vh;
+  min-height: 100vh; 
+  padding: 8px;
+} 
+
+
+#header{
+  border-radius: 8px;
+}
+
+#header-controls{
+  display: flex;
+  gap: 8px;
+}
+
+#main{
+  flex-grow: 1;
+}
+
+#logo{
+  color: white;
+  background-color:rgb(19, 129, 253);
+  padding: 8px;
+  border-radius: 8px;
+}
