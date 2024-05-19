@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{
+            background-color: #eee;
+            font-family: sans-serif;
+        }
+
+        #container{
+            display: flex;
+            flex-direction: column;
+            width: 800px;
+            height: 600px;
+            border: 1px solid black;
+            border-radius: 8px;
+            background-clip: padding-box;
+            overflow: hidden;
+            margin: 16px auto;
+        }
+
+        #header{
+            display:flex;
+            align-items: center;
+            gap: 8px;
+            flex: 0 1 auto;
+            height: 32px;
+            padding: 8px 16px;
+            background-color: hsl(242, 44%, 43%);
+            color: white;
+        }
+
+        #main{
+            display: flex;
+            background-color: hsl(242, 44%, 92%);
+        }
+
+        #sidebar{
+            display:flex;
+            flex: 0 0 250px;
+            flex-direction: column;
+            background-color: hsl(242, 44%, 89%);
+            overflow-y: auto;
+        }
+
+        #preview{
+            flex: 1 1 auto;
+            margin: 12px; 
+            padding: 12px;
+            border-radius: 4px;
+            background-color: hsla(240, 0%, 100%, 0.7);
+            font-size: 12px;
+        }
+
+        #preview pre{
+            white-space:pre-wrap;
+        }
+
+        .sidebar-item{
+            display:flex;
+            flex-direction: column;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            width: 54px;
+            height: 54px;
+            gap: 4px;
+            border-radius: 4px;
+            margin: 4px;
+            font-size: 10px;
+            cursor: pointer;
+        }
+
+        .sidebar-item svg{
+            width: 32px;
+            height: 32px;
+        }
+
+        .sidebar-item:hover{
+            background-color: rgba(0,0,0,0.1);
+        }
+
+        .sidebar-item.active{
+            background-color: hsla(242, 44%, 43%, 0.829);
+        }
+
+        .email-item{
+            list-style:none;
+            padding: 12px;
+            margin: 8px 8px 0px 8px;
+            border-radius: 4px;
+            background-color: rgba(250,250,250,0.75);
+            font-size: 12px;
+        }
+
+        .email-item:hover{
+            background-color: rgba(0,0,0,0.1);
+        }
+
+        .email-item.selected{
+            border-left: 4px solid rgba(151, 105, 232, 0.95);
+        }
+
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="header">
+            Email List
+        </div>
+        <div id="main">
+            <div id="sidebar">
+
+            </div>
+            <div id="preview">
+ 
+            </div>
+        </div>
+    </div>
+
+<script>
+
+const emailList = [ { "title": "Re: Project update", "sender": "Alice Smith", "date": "2023-11-12 08:30:00", "content": "Hi Bob,\n\nThanks for the update. I’m glad to hear that the project is on track. I have attached the latest report for your review. Please let me know if you have any questions or feedback.\n\nBest,\nAlice" }, { "title": "Project update", "sender": "Bob Jones", "date": "2023-11-12 08:15:00", "content": "Hi Alice,\n\nI hope this email finds you well. I wanted to give you a quick update on the project. We have completed the first phase and are now working on the second phase. Everything is going smoothly and we expect to finish by the deadline. I have attached the progress report for your reference.\n\nCheers,\nBob" }, { "title": "Re: Invitation to the annual gala", "sender": "Charles Lee", "date": "2023-11-12 08:10:00", "content": "Hi David,\n\nThank you for the invitation. I would love to attend the annual gala. It sounds like a wonderful event. I look forward to seeing you and the rest of the team there.\n\nSincerely,\nCharles" }, { "title": "Invitation to the annual gala", "sender": "David Kim", "date": "2023-11-12 08:00:00", "content": "Hi Charles,\n\nI hope you are doing well. I am writing to invite you to the annual gala of our company. It will be held on November 30th at 7 pm at the Grand Hotel. It will be a night of celebration, recognition, and networking. Please RSVP by November 20th if you can make it.\n\nBest regards,\nDavid" }, { "title": "Re: Re: Re: Urgent issue", "sender": "Emma Watson", "date": "2023-11-12 07:50:00", "content": "Hi Frank,\n\nThank you for your prompt response. I appreciate your help in resolving this issue. I have followed your instructions and everything is working fine now. You are a lifesaver!\n\nKind regards,\nEmma" }, { "title": "Re: Re: Urgent issue", "sender": "Frank Brown", "date": "2023-11-12 07:45:00", "content": "Hi Emma,\n\nI’m sorry to hear that you are having trouble with the system. I have checked the logs and found the cause of the problem. It seems that there was a configuration error on the server side. I have fixed it and restarted the system. Please try again and let me know if it works.\n\nBest wishes,\nFrank" }, { "title": "Re: Urgent issue", "sender": "Emma Watson", "date": "2023-11-12 07:40:00", "content": "Hi Frank,\n\nI hope you are well. I am writing to report an urgent issue with the system. I can’t log in to the dashboard and I get an error message saying ‘Internal server error’. This is affecting my work and I need your help as soon as possible.\n\nThank you,\nEmma" }, { "title": "Urgent issue", "sender": "Emma Watson", "date": "2023-11-12 07:35:00", "content": "Hi Frank,\n\nI hope you are well. I am writing to report an urgent issue with the system. I can’t log in to the dashboard and I get an error message saying ‘Internal server error’. This is affecting my work and I need your help as soon as possible.\n\nThank you,\nEmma" }, { "title": "Re: Happy birthday!", "sender": "George Wilson", "date": "2023-11-12 07:30:00", "content": "Hi Hannah,\n\nThank you for the birthday wishes. I had a great day with my family and friends. I appreciate your kind words and your friendship.\n\nTake care,\nGeorge" }, { "title": "Happy birthday!", "sender": "Hannah Miller", "date": "2023-11-12 07:25:00", "content": "Hi George,\n\nHappy birthday to you! I hope you have a wonderful day and a fantastic year ahead. You are a great person and a valuable colleague. I’m lucky to have you as a friend.\n\nBest,\nHannah" }, { "title": "Re: Meeting reminder", "sender": "Iris Clark", "date": "2023-11-12 07:20:00", "content": "Hi Jack,\n\nThank you for the reminder. I have marked the meeting in my calendar and I will be there on time. I look forward to discussing the project with you and the rest of the team.\n\nRegards,\nIris" }, { "title": "Meeting reminder", "sender": "Jack Smith", "date": "2023-11-12 07:15:00", "content": "Hi Iris,\n\nThis is a friendly reminder that we have a meeting scheduled for tomorrow at 10 am. The meeting will be held in the conference room on the third floor. The agenda for the meeting is to review the progress of the project and to assign the next tasks. Please come prepared with your updates and questions.\n\nThanks,\nJack" }, { "title": "Re: Newsletter feedback", "sender": "Kevin Johnson", "date": "2023-11-12 07:10:00", "content": "Hi Laura,\n\nThank you for your feedback. I’m glad you enjoyed the newsletter and found it useful. I appreciate your suggestions and I will try to implement them in the next edition. Please keep reading and sharing your thoughts with me.\n\nCheers,\nKevin" }, { "title": "Newsletter feedback", "sender": "Laura Davis", "date": "2023-11-12 07:05:00", "content": "Hi Kevin,\n\nI just wanted to say that I really liked your latest newsletter. It was informative, engaging, and well-written. I especially liked the section on the latest trends and tips. I learned a lot from it and I’m looking forward to applying them in my work. I have a few suggestions for improvement, though. I think you could make the newsletter more visually appealing by adding some images and graphics. I also think you could make the content more interactive by adding some polls and quizzes. I hope you don’t mind me sharing my opinion with you.\n\nKeep up the good work,\nLaura" }, { "title": "Re: Thank you note", "sender": "Mary Wilson", "date": "2023-11-12 07:00:00", "content": "Hi Noah,\n\nYou are very welcome. I’m happy to hear that you liked the gift. It was my pleasure to celebrate your achievement with you. You deserve it. You have worked hard and shown great results. I’m proud of you and I’m sure you will continue to excel in your career.\n\nWarm regards,\nMary" }, { "title": "Thank you note", "sender": "Noah Jones", "date": "2023-11-12 06:55:00", "content": "Hi Mary,\n\nI just wanted to thank you for the lovely gift you sent me. It was very thoughtful and generous of you. I really appreciate it. The gift card was perfect. I used it to buy a new book that I’ve been wanting to read for a long time. I can’t wait to dive into it. Thank you for making my day.\n\nGratefully,\nNoah" } ];
+
+// Assuming the JSON list of emails is stored in a variable called emailList
+// Assuming there are two HTML elements with ids "sidebar" and "preview"
+
+// A function to create a list item element for each email
+function createListItem(email) {
+    // Create a list item element
+    let li = document.createElement("li");
+    // Set the class name to "email-item"
+    li.className = "email-item";
+    // Set the data attributes to store the email details
+    li.dataset.title = email.title;
+    li.dataset.sender = email.sender;
+    li.dataset.date = email.date;
+    li.dataset.content = email.content;
+    // Add an event listener to handle the click event
+    li.addEventListener("click", showEmail);
+    // Create a span element to display the email title, sender
+    let titleSpan = document.createElement("div");
+    titleSpan.textContent = email.title;
+    let senderSpan = document.createElement("strong")
+    senderSpan.textContent = email.sender;
+    let dateSpan = document.createElement("div")
+    dateSpan.textContent = email.date;
+
+    li.appendChild(senderSpan);
+    li.appendChild(dateSpan);
+    li.appendChild(titleSpan);
+    // Return the list item element
+    return li;
+}
+
+// A function to show the email content on the preview pane
+function showEmail(event) {
+    // Get the list item element that was clicked
+    let li = event.currentTarget ;
+    console.log(event.currentTarget );
+    
+    // Get the email details from the data attributes
+    let title = li.dataset.title;
+    let sender = li.dataset.sender;
+    let date = li.dataset.date;
+    let content = li.dataset.content;
+    // Get the preview element
+    let preview = document.getElementById("preview");
+    // Clear the previous content
+    preview.innerHTML = "";
+    // Create a heading element to display the email title
+    let h1 = document.createElement("h1");
+    // Set the text content to the email title
+    h1.textContent = title;
+    // Append the heading element to the preview element
+    preview.appendChild(h1);
+    // Create a paragraph element to display the email sender and date
+    let p = document.createElement("p");
+    // Set the text content to the email sender and date
+    p.textContent = "From: " + sender + " | Date: " + date;
+    // Append the paragraph element to the preview element
+    preview.appendChild(p);
+    // Create a pre element to display the email content
+    let pre = document.createElement("pre");
+    // Set the text content to the email content
+    pre.textContent = content;
+    // Append the pre element to the preview element
+    preview.appendChild(pre);
+    // Get all the list item elements
+    let lis = document.querySelectorAll(".email-item");
+    // Loop through the list item elements
+    for (let i = 0; i < lis.length; i++) {
+        // Remove the "selected" class from each list item element
+        lis[i].classList.remove("selected");
+    }
+    // Add the "selected" class to the clicked list item element
+    li.classList.add("selected");
+}
+
+// Get the sidebar element
+let sidebar = document.getElementById("sidebar");
+// Loop through the email list
+for (let i = 0; i < emailList.length; i++) {
+    // Get the current email
+    let email = emailList[i];
+    // Create a list item element for the current email
+    let li = createListItem(email);
+    // Append the list item element to the sidebar element
+    sidebar.appendChild(li);
+}
+
+
+</script>
+
+</body>
+</html>
